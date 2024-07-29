@@ -1,51 +1,46 @@
 import tkinter as tk
 from tkinter import messagebox
 from auth.auth import AuthController
-from views.todo import TodoView
 
 class LoginView:
-    def __init__(self, root):
+    def __init__(self, root, on_login_success):
         self.root = root
-        self.root.title("Login")
+        self.on_login_success = on_login_success
         self.auth_controller = AuthController()
 
-        # Username
-        self.username_label = tk.Label(root, text="Username")
-        self.username_label.pack()
-        self.username_entry = tk.Entry(root)
-        self.username_entry.pack()
+        self.setup_login_frame()
 
-        # Password
-        self.password_label = tk.Label(root, text="Password")
-        self.password_label.pack()
-        self.password_entry = tk.Entry(root, show="*")
-        self.password_entry.pack()
+    def setup_login_frame(self):
+        self.login_frame = tk.Frame(self.root)
+        self.login_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Login Button
-        self.login_button = tk.Button(root, text="Login", command=self.login)
-        self.login_button.pack()
+        tk.Label(self.login_frame, text="Username").pack(pady=5)
+        self.username_entry = tk.Entry(self.login_frame)
+        self.username_entry.pack(pady=5)
 
-        # Register Button
-        self.register_button = tk.Button(root, text="Register", command=self.open_register_view)
-        self.register_button.pack()
+        tk.Label(self.login_frame, text="Password").pack(pady=5)
+        self.password_entry = tk.Entry(self.login_frame, show="*")
+        self.password_entry.pack(pady=5)
+
+        login_button = tk.Button(self.login_frame, text="Login", command=self.login)
+        login_button.pack(pady=10)
+
+        register_button = tk.Button(self.login_frame, text="Register", command=self.register)
+        register_button.pack(pady=10)
 
     def login(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
         if self.auth_controller.login(username, password):
-            self.show_todo_view(username)
+            self.login_frame.pack_forget()
+            self.on_login_success(username)  # Call the callback with the username
         else:
-            messagebox.showerror("Login", "Invalid credentials")
+            messagebox.showerror("Login Error", "Invalid username or password.")
 
-    def open_register_view(self):
-        self.clear_frame()
-        from views.register import RegisterView
-        RegisterView(self.root)
-
-    def show_todo_view(self, username):
-        self.clear_frame()
-        TodoView(self.root, username)
-
-    def clear_frame(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()
+    def register(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        if self.auth_controller.register(username, password):
+            messagebox.showinfo("Registration Success", "User registered successfully.")
+        else:
+            messagebox.showerror("Registration Error", "Username already exists.")
