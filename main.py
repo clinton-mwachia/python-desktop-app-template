@@ -18,7 +18,7 @@ class App:
     def show_dashboard(self, username):
         self.clear_frames()
         self.sidebar_frame = tk.Frame(self.root)
-        self.sidebar_frame.pack(side=tk.LEFT, fill="both", padx=10, pady=50)
+        self.sidebar_frame.pack(side=tk.LEFT, fill="both", padx=10, pady=55)
 
         self.content_frame = tk.Frame(self.root)
         self.content_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10, pady=10)
