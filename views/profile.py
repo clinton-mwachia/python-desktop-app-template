@@ -9,8 +9,8 @@ class ProfileView:
         self.user_model = UserModel()
         self.user = self.user_model.find_user(username)
 
-        self.profile_frame = tk.Frame(root)
-        self.profile_frame.pack(fill=tk.BOTH, expand=True)
+        self.profile_frame = tk.Frame(root, bg='white', borderwidth=2, relief='groove', padx=20, pady=20)
+        self.profile_frame.pack(fill=tk.BOTH)
 
         self.setup_profile_frame()
 
