@@ -8,39 +8,35 @@ class LoginView:
         self.on_login_success = on_login_success
         self.auth_controller = AuthController()
 
-        self.setup_login_frame()
+        self.frame = tk.Frame(root)
+        self.frame.pack(pady=100)
 
-    def setup_login_frame(self):
-        self.login_frame = tk.Frame(self.root)
-        self.login_frame.pack(fill=tk.BOTH, expand=True)
+        tk.Label(self.frame, text="Username").pack()
+        self.username_entry = tk.Entry(self.frame)
+        self.username_entry.pack()
 
-        tk.Label(self.login_frame, text="Username").pack(pady=5)
-        self.username_entry = tk.Entry(self.login_frame)
-        self.username_entry.pack(pady=5)
+        tk.Label(self.frame, text="Password").pack()
+        self.password_entry = tk.Entry(self.frame, show="*")
+        self.password_entry.pack()
 
-        tk.Label(self.login_frame, text="Password").pack(pady=5)
-        self.password_entry = tk.Entry(self.login_frame, show="*")
-        self.password_entry.pack(pady=5)
-
-        login_button = tk.Button(self.login_frame, text="Login", command=self.login)
+        login_button = tk.Button(self.frame, text="Login", command=self.login)
         login_button.pack(pady=10)
 
-        register_button = tk.Button(self.login_frame, text="Register", command=self.register)
-        register_button.pack(pady=10)
+        register_button = tk.Button(self.frame, text="Register", command=self.register)
+        register_button.pack()
 
     def login(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
         if self.auth_controller.login(username, password):
-            self.login_frame.pack_forget()
-            self.on_login_success(username)  # Call the callback with the username
+            self.on_login_success(username)
         else:
-            messagebox.showerror("Login Error", "Invalid username or password.")
+            messagebox.showerror("Login Failed", "Invalid username or password")
 
     def register(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
         if self.auth_controller.register(username, password):
-            messagebox.showinfo("Registration Success", "User registered successfully.")
+            messagebox.showinfo("Registration Successful", "You can now log in")
         else:
-            messagebox.showerror("Registration Error", "Username already exists.")
+            messagebox.showerror("Registration Failed", "Username already exists")
