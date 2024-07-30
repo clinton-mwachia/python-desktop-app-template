@@ -8,7 +8,7 @@ class App:
         self.sidebar_frame = None
         self.content_frame = None
         self.login_view = None
-        
+
         self.show_login()
 
     def show_login(self):
@@ -17,11 +17,11 @@ class App:
 
     def show_dashboard(self, username):
         self.clear_frames()
-        self.sidebar_frame = tk.Frame(self.root, bg='gray')
-        self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
+        self.sidebar_frame = tk.Frame(self.root)
+        self.sidebar_frame.pack(side=tk.LEFT, fill="both", padx=10, pady=50)
 
         self.content_frame = tk.Frame(self.root)
-        self.content_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.content_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         # Pass the logout callback function to DashboardView
         self.dashboard_view = DashboardView(self.sidebar_frame, self.content_frame, username, self.show_login)
