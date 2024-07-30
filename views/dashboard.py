@@ -1,7 +1,10 @@
 import tkinter as tk
+from tkinter import ttk
 from views.todo import TodoView
 from views.user import UserView
 from views.profile import ProfileView
+from models.user import UserModel
+from models.todo import TodoModel
 
 class DashboardView:
     def __init__(self, sidebar_frame, content_frame, username, logout_callback):
@@ -9,11 +12,13 @@ class DashboardView:
         self.content_frame = content_frame
         self.username = username
         self.logout_callback = logout_callback
+        self.user_model = UserModel()
+        self.todo_model = TodoModel()
 
         self.setup_sidebar()
 
-        # Initially show the todos view
-        self.show_todos()
+        # Initially show the dashboard view
+        self.show_dashboard()
 
     def setup_sidebar(self):
         tk.Button(self.sidebar_frame, text="Dashboard", command=self.show_dashboard, width=15).pack(fill=tk.X)
@@ -24,8 +29,7 @@ class DashboardView:
 
     def show_dashboard(self):
         self.clear_content()
-        # Add any dashboard-specific widgets here
-        tk.Label(self.content_frame, text="Welcome to the Dashboard").pack(pady=20)
+        self.create_summary_boxes()
 
     def show_todos(self):
         self.clear_content()
@@ -46,3 +50,49 @@ class DashboardView:
     def clear_content(self):
         for widget in self.content_frame.winfo_children():
             widget.destroy()
+
+    def create_summary_boxes(self):
+         # Get the user object to retrieve user ID
+        user = self.user_model.find_user(self.username)
+        user_id = user["_id"]
+
+        # Top Frame for Summary Boxes
+        top_frame = tk.Frame(self.content_frame)
+        top_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=10)
+
+        # Summary Box for Total Todos
+        total_todos = self.todo_model.get_total_todos(user_id)  
+        total_todos_label = tk.Label(top_frame, text=f"Total Todos: {total_todos}", font=('Helvetica', 16))
+        total_todos_label.pack(side=tk.LEFT, padx=10)
+
+        # Summary Box for Total Users
+        total_users = self.user_model.get_total_users()  # Method should return the total number of users
+        total_users_label = tk.Label(top_frame, text=f"Total Users: {total_users}", font=('Helvetica', 16))
+        total_users_label.pack(side=tk.LEFT, padx=10)
+
+        # Additional Summary Box (e.g., Total Completed Todos)
+        completed_todos = self.todo_model.get_completed_todos()  # Method should return the total number of completed todos
+        completed_todos_label = tk.Label(top_frame, text=f"Completed Todos: {completed_todos}", font=('Helvetica', 16))
+        completed_todos_label.pack(side=tk.LEFT, padx=10)
+
+    def get_todo_status_data(self):
+        # Replace with real data
+        todos = list(self.todo_model.get_all_todos())  # Replace with method to fetch todos
+        status_counts = {"Completed": 0, "Pending": 0}
+        for todo in todos:
+            if todo.get("completed"):
+                status_counts["Completed"] += 1
+            else:
+                status_counts["Pending"] += 1
+        return status_counts
+
+    def get_user_activity_data(self):
+        # Replace with real data
+        users = list(self.user_model.get_all_users())  # Replace with method to fetch users
+        activity_counts = {"Active": 0, "Inactive": 0}
+        for user in users:
+            if user.get("active"):
+                activity_counts["Active"] += 1
+            else:
+                activity_counts["Inactive"] += 1
+        return activity_counts
