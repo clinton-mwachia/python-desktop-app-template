@@ -15,7 +15,7 @@ class ProfileView:
         self.setup_profile_frame()
 
     def setup_profile_frame(self):
-        tk.Label(self.profile_frame, text="Profile").pack(pady=10)
+        tk.Label(self.profile_frame, text="User Profile").pack(pady=10)
 
         # Display user profile picture
         if 'profile_picture' in self.user and self.user['profile_picture']:

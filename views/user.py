@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import  messagebox
+from tkinter import messagebox
 from tkinter import ttk
 from models.user import UserModel
 from bson.objectid import ObjectId
@@ -112,7 +112,7 @@ class UserView:
         new_password = self.password_entry.get()
         new_email = self.email_entry.get()
         if new_username and new_password:
-            self.user_model.update_user(user_id, new_username, new_password, new_email)
+            self.user_model.update_user(user_id, username=new_username, email=new_email)
             self.load_users()
         else:
             messagebox.showwarning("Input Error", "Please enter both username and password.")
@@ -120,7 +120,7 @@ class UserView:
 
     def delete_user(self, user_id):
         if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this user?"):
-            self.user_model.delete_user(user_id)
+            self.user_model.collection.delete_one({"_id": ObjectId(user_id)})
             self.load_users()
 
     def on_tree_select(self, event):
