@@ -5,11 +5,13 @@ from auth.auth import AuthController
 class LoginView:
     def __init__(self, root, on_login_success):
         self.root = root
+        self.root.title("Login User") # title of the main frame
+        self.root.geometry("400x400") # width and height of the main frame
         self.on_login_success = on_login_success
         self.auth_controller = AuthController()
 
-        self.frame = tk.Frame(root)
-        self.frame.pack(pady=100)
+        self.frame = tk.Frame(root, bg='white', borderwidth=2, relief='groove', padx=20, pady=20)
+        self.frame.place(relx=0.5, rely=0.5, anchor='center', width=300, height=200)
 
         tk.Label(self.frame, text="Username").pack()
         self.username_entry = tk.Entry(self.frame)
