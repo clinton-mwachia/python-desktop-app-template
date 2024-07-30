@@ -1,11 +1,12 @@
 from utils.database import Database
+from bson.objectid import ObjectId
 
 class UserModel:
     def __init__(self):
         self.collection = Database('todo_app').get_collection('users')
 
-    def create_user(self, username, password, profile_picture=None):
-        user = {"username": username, "password": password, "profile_picture": profile_picture}
+    def create_user(self, username, password, email=None):
+        user = {"username": username, "password": password, "email": email}
         self.collection.insert_one(user)
 
     def find_user(self, username):
@@ -15,14 +16,14 @@ class UserModel:
         user = self.find_user(username)
         return user and user['password'] == password
 
-    def update_profile(self, username, email=None, profile_picture=None):
+    def update_user(self, user_id, username=None, email=None):
         update_fields = {}
+        if username:
+            update_fields['username'] = username
         if email:
             update_fields['email'] = email
-        if profile_picture:
-            update_fields['profile_picture'] = profile_picture
         if update_fields:
-            self.collection.update_one({"username": username}, {"$set": update_fields})
+            self.collection.update_one({"_id": ObjectId(user_id)}, {"$set": update_fields})
 
     def get_all_users(self):
         return self.collection.find()
