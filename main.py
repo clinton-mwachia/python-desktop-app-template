@@ -23,15 +23,18 @@ class App:
         self.content_frame = tk.Frame(self.root)
         self.content_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-        self.dashboard_view = DashboardView(self.sidebar_frame, self.content_frame, username)
+        # Pass the logout callback function to DashboardView
+        self.dashboard_view = DashboardView(self.sidebar_frame, self.content_frame, username, self.show_login)
 
     def clear_frames(self):
         if self.sidebar_frame:
             self.sidebar_frame.destroy()
+            self.sidebar_frame = None
         if self.content_frame:
             self.content_frame.destroy()
+            self.content_frame = None
         if self.login_view:
-            self.login_view.frame.destroy()
+            self.login_view.frame.destroy()  # Assuming login_view has an attribute frame
 
 def main():
     root = tk.Tk()
