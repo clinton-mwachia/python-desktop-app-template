@@ -8,7 +8,7 @@ class App:
         self.sidebar_frame = None
         self.content_frame = None
         self.login_view = None
-
+        
         self.show_login()
 
     def show_login(self):
@@ -17,8 +17,8 @@ class App:
 
     def show_dashboard(self, username):
         self.clear_frames()
-        self.sidebar_frame = tk.Frame(self.root, width=200, bg='gray')
-        self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y)
+        self.sidebar_frame = tk.Frame(self.root, bg='gray')
+        self.sidebar_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
 
         self.content_frame = tk.Frame(self.root)
         self.content_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
@@ -34,7 +34,7 @@ class App:
             self.content_frame.destroy()
             self.content_frame = None
         if self.login_view:
-            self.login_view.frame.destroy()  # Assuming login_view has an attribute frame
+            self.login_view.frame.destroy() 
 
 def main():
     root = tk.Tk()
