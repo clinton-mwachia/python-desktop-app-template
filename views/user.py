@@ -22,9 +22,10 @@ class UserView:
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
 
         # Treeview for displaying users
-        self.tree = ttk.Treeview(self.tree_frame, columns=("username", "email", "actions"), show="headings")
+        self.tree = ttk.Treeview(self.tree_frame, columns=("username", "email", "active", "actions"), show="headings")
         self.tree.heading("username", text="Username")
         self.tree.heading("email", text="Email")
+        self.tree.heading("active", text="Status")
         self.tree.heading("actions", text="Actions")
         self.tree.column("actions", width=150, anchor=tk.CENTER)
         self.tree.pack(fill=tk.BOTH, expand=True)
