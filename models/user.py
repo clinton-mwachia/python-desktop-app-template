@@ -6,7 +6,7 @@ class UserModel:
         self.collection = Database('todo_app').get_collection('users')
 
     def create_user(self, username, password, email=None):
-        user = {"username": username, "password": password, "email": email}
+        user = {"username": username, "password": password, "email": email, "active": True}
         self.collection.insert_one(user)
 
     def find_user(self, username):
@@ -27,3 +27,12 @@ class UserModel:
 
     def get_all_users(self):
         return self.collection.find()
+
+    def get_total_users(self):
+        return self.collection.count_documents({})
+
+    def get_active_users(self):
+        return self.collection.count_documents({"active": True})
+
+    def get_inactive_users(self):
+        return self.collection.count_documents({"active": False})

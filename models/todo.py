@@ -1,4 +1,5 @@
 from utils.database import Database
+from bson.objectid import ObjectId
 
 class TodoModel:
     def __init__(self):
@@ -17,7 +18,13 @@ class TodoModel:
             update["title"] = title
         if description:
             update["description"] = description
-        self.collection.update_one({"_id": todo_id}, {"$set": update})
+        self.collection.update_one({"_id": ObjectId(todo_id)}, {"$set": update})
 
     def delete_todo(self, todo_id):
-        self.collection.delete_one({"_id": todo_id})
+        self.collection.delete_one({"_id": ObjectId(todo_id)})
+
+    def get_total_todos(self, user_id):
+        return self.collection.count_documents({"user_id": user_id})
+    
+    def get_completed_todos(self):
+        return self.collection.count_documents({"completed": True})
