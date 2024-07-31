@@ -30,6 +30,7 @@ class DashboardView:
     def show_dashboard(self):
         self.clear_content()
         self.create_summary_boxes()
+        self.todos_by_status_table()
 
     def show_todos(self):
         self.clear_content()
@@ -45,7 +46,7 @@ class DashboardView:
 
     def logout(self):
         self.clear_content()
-        self.logout_callback()  # Call the logout callback function
+        self.logout_callback()  
 
     def clear_content(self):
         for widget in self.content_frame.winfo_children():
@@ -57,10 +58,10 @@ class DashboardView:
         user_id = user["_id"]
 
         # Top Frame for Summary Boxes
-        top_frame = tk.Frame(self.content_frame)
-        top_frame.pack(fill=tk.BOTH, expand=True, pady=20)
+        top_frame = tk.Frame(self.content_frame,bg="gray")
+        top_frame.pack(fill=tk.BOTH,pady=(45,0), padx=5)
 
-         # Configure grid layout to expand with window size
+        # Configure grid layout to expand with window size
         top_frame.grid_columnconfigure(0, weight=1)
         top_frame.grid_columnconfigure(1, weight=1)
         top_frame.grid_columnconfigure(2, weight=1)
@@ -80,13 +81,40 @@ class DashboardView:
 
     # create summary box
     def create_summary_box(self, parent, title, value, row, column):
-        frame = ttk.LabelFrame(parent, text=title, padding=(20, 10))
-        frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        frame = ttk.LabelFrame(parent, text=title, padding=(5,2))
+        frame.grid(row=row, column=column, padx=5, pady=5, sticky="nsew")
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_columnconfigure(0, weight=1)
 
         value_label = ttk.Label(frame, text=str(value), font=("Helvetica", 24, "bold"))
-        value_label.grid(row=0, column=0, pady=20, padx=20)
+        value_label.grid(row=0, column=0, pady=5, padx=5)
 
+    def todos_by_status_table(self):
+        table_frame = tk.Frame(self.content_frame, padx=5, pady=5)
+        table_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+
+        statuses = [
+            ("Completed", self.todo_model.count_todos_by_status("completed")),
+            ("Active", self.todo_model.count_todos_by_status("active")),
+            ("Domant", self.todo_model.count_todos_by_status("domant"))
+        ]
+
+        # Determine the number of rows
+        num_rows = len(statuses)
+
+        # Create the Treeview widget
+        columns = ("status", "count")
+        tree = ttk.Treeview(table_frame, columns=columns, show="headings", height=num_rows)
+        tree.heading("status", text="Status")
+        tree.heading("count", text="Count")
+        tree.column("status", anchor=tk.CENTER, width=150)
+        tree.column("count", anchor=tk.CENTER, width=100)
+
+        # Insert data into the table
+        for status, count in statuses:
+            tree.insert("", tk.END, values=(status, count))
+
+        # Pack the Treeview widget with adjusted padding
+        tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=(0, 5)) 
 
 
