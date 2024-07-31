@@ -70,29 +70,9 @@ class DashboardView:
         total_users_label = tk.Label(top_frame, text=f"Total Users: {total_users}", font=('Helvetica', 16))
         total_users_label.pack(side=tk.LEFT, padx=10)
 
-        # Additional Summary Box (e.g., Total Completed Todos)
+        # Summary Box for Total Completed Todos
         completed_todos = self.todo_model.get_completed_todos()  # Method should return the total number of completed todos
         completed_todos_label = tk.Label(top_frame, text=f"Completed Todos: {completed_todos}", font=('Helvetica', 16))
         completed_todos_label.pack(side=tk.LEFT, padx=10)
 
-    def get_todo_status_data(self):
-        # Replace with real data
-        todos = list(self.todo_model.get_all_todos())  # Replace with method to fetch todos
-        status_counts = {"Completed": 0, "Pending": 0}
-        for todo in todos:
-            if todo.get("completed"):
-                status_counts["Completed"] += 1
-            else:
-                status_counts["Pending"] += 1
-        return status_counts
 
-    def get_user_activity_data(self):
-        # Replace with real data
-        users = list(self.user_model.get_all_users())  # Replace with method to fetch users
-        activity_counts = {"Active": 0, "Inactive": 0}
-        for user in users:
-            if user.get("active"):
-                activity_counts["Active"] += 1
-            else:
-                activity_counts["Inactive"] += 1
-        return activity_counts

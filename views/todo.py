@@ -27,9 +27,10 @@ class TodoView:
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
 
         # Treeview for displaying todos
-        self.tree = ttk.Treeview(self.tree_frame, columns=("title", "description", "actions"), show="headings")
+        self.tree = ttk.Treeview(self.tree_frame, columns=("title", "description", "status","actions"), show="headings")
         self.tree.heading("title", text="Title")
         self.tree.heading("description", text="Description")
+        self.tree.heading("status", text="Status")
         self.tree.heading("actions", text="Actions")
         self.tree.column("actions", width=150, anchor=tk.CENTER)
         self.tree.pack(fill=tk.BOTH, expand=True)
@@ -44,7 +45,7 @@ class TodoView:
         self.todos = list(self.todo_model.get_todos(self.user['_id']))
         for todo in self.todos:
             self.tree.insert("", tk.END, iid=str(todo['_id']),
-                             values=(todo['title'], todo['description'], 'Edit/Delete'))
+                             values=(todo['title'], todo['description'], todo.get('status', 'NA'), 'Edit/Delete'))
 
     def add_todo(self):
         # Create a new top-level window for adding a todo
@@ -61,18 +62,27 @@ class TodoView:
         self.description_entry = tk.Entry(self.add_todo_window)
         self.description_entry.pack(pady=5)
 
+        # Status label and combobox
+        tk.Label(self.add_todo_window, text="Status").pack(pady=5)
+        self.status_combobox = ttk.Combobox(self.add_todo_window, values=["completed", "active", "domant"])
+        self.status_combobox.current(1)  # Set default status to 'active'
+        self.status_combobox.pack(pady=5)
+
         # Add button
         add_button = tk.Button(self.add_todo_window, text="Add", command=self.save_todo)
         add_button.pack(pady=10)
 
     def save_todo(self):
-        title = self.title_entry.get()
-        description = self.description_entry.get()
-        if title and description:
-            self.todo_model.add_todo(self.user['_id'], title, description)
-            self.load_todos()
-        else:
-            messagebox.showwarning("Input Error", "Please enter both title and description.")
+        user = self.todo_model.collection.find_one({"username": self.username})
+        if user:
+            title = self.title_entry.get()
+            description = self.description_entry.get()
+            status = self.status_combobox.get()
+            if title and description and status:
+                self.todo_model.add_todo(user["_id"], title, description, status)
+                self.load_todos()
+            else:
+                messagebox.showwarning("Input Error", "Please enter all fields.")
         self.add_todo_window.destroy()  # Close the add todo window
 
     def update_todo(self, todo_id):
@@ -96,6 +106,12 @@ class TodoView:
         self.description_entry.insert(0, todo['description'])
         self.description_entry.pack(pady=5)
 
+        # Status label and combobox
+        tk.Label(self.update_todo_window, text="Status").pack(pady=5)
+        self.status_combobox = ttk.Combobox(self.update_todo_window, values=["completed", "active", "domant"])
+        self.status_combobox.set(todo.get('status', 'No status'))
+        self.status_combobox.pack(pady=5)
+
         # Save button
         save_button = tk.Button(self.update_todo_window, text="Save", command=lambda: self.save_updated_todo(todo_id))
         save_button.pack(pady=10)
@@ -103,8 +119,9 @@ class TodoView:
     def save_updated_todo(self, todo_id):
         new_title = self.title_entry.get()
         new_description = self.description_entry.get()
-        if new_title and new_description:
-            self.todo_model.update_todo(todo_id, new_title, new_description)
+        new_status = self.status_combobox.get()
+        if new_title and new_description and new_status:
+            self.todo_model.update_todo(todo_id, new_title, new_description, new_status)
             self.load_todos()
         else:
             messagebox.showwarning("Input Error", "Please enter both title and description.")
