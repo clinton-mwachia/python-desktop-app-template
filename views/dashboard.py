@@ -58,21 +58,35 @@ class DashboardView:
 
         # Top Frame for Summary Boxes
         top_frame = tk.Frame(self.content_frame)
-        top_frame.pack(side=tk.TOP, fill=tk.X, padx=10, pady=10)
+        top_frame.pack(fill=tk.BOTH, expand=True, pady=20)
+
+         # Configure grid layout to expand with window size
+        top_frame.grid_columnconfigure(0, weight=1)
+        top_frame.grid_columnconfigure(1, weight=1)
+        top_frame.grid_columnconfigure(2, weight=1)
 
         # Summary Box for Total Todos
         total_todos = self.todo_model.get_total_todos(user_id)  
-        total_todos_label = tk.Label(top_frame, text=f"Total Todos: {total_todos}", font=('Helvetica', 16))
-        total_todos_label.pack(side=tk.LEFT, padx=10)
-
         # Summary Box for Total Users
-        total_users = self.user_model.get_total_users()  # Method should return the total number of users
-        total_users_label = tk.Label(top_frame, text=f"Total Users: {total_users}", font=('Helvetica', 16))
-        total_users_label.pack(side=tk.LEFT, padx=10)
-
+        total_users = self.user_model.get_total_users()
         # Summary Box for Total Completed Todos
-        completed_todos = self.todo_model.get_completed_todos()  # Method should return the total number of completed todos
-        completed_todos_label = tk.Label(top_frame, text=f"Completed Todos: {completed_todos}", font=('Helvetica', 16))
-        completed_todos_label.pack(side=tk.LEFT, padx=10)
+        completed_todos = self.todo_model.get_completed_todos()
+
+        # Create beautiful boxes for summary stats
+        self.create_summary_box(top_frame, "Total Users", total_users, 0, 0)
+        self.create_summary_box(top_frame, "Total Todos", total_todos, 0, 1)
+        self.create_summary_box(top_frame, "Completed Todos", completed_todos, 0, 2)
+
+
+    # create summary box
+    def create_summary_box(self, parent, title, value, row, column):
+        frame = ttk.LabelFrame(parent, text=title, padding=(20, 10))
+        frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        frame.grid_rowconfigure(0, weight=1)
+        frame.grid_columnconfigure(0, weight=1)
+
+        value_label = ttk.Label(frame, text=str(value), font=("Helvetica", 24, "bold"))
+        value_label.grid(row=0, column=0, pady=20, padx=20)
+
 
 
