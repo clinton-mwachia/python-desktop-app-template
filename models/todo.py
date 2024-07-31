@@ -30,3 +30,6 @@ class TodoModel:
     
     def get_completed_todos(self):
         return self.collection.count_documents({"status": 'completed'})
+    
+    def count_todos_by_status(self, status):
+        return self.collection.count_documents({"status": status})
