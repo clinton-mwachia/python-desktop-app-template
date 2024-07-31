@@ -71,6 +71,7 @@ class TodoView:
     def add_todo(self):
         self.add_todo_window = tk.Toplevel(self.root)
         self.add_todo_window.title("Add Todo")
+        self.add_todo_window.geometry("300x300")
 
         tk.Label(self.add_todo_window, text="Title").pack(pady=5)
         self.title_entry = tk.Entry(self.add_todo_window)
@@ -106,6 +107,7 @@ class TodoView:
 
         self.update_todo_window = tk.Toplevel(self.root)
         self.update_todo_window.title("Update Todo")
+        self.update_todo_window.geometry("300x300")
 
         tk.Label(self.update_todo_window, text="Title").pack(pady=5)
         self.title_entry = tk.Entry(self.update_todo_window)

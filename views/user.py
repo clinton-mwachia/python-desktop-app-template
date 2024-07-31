@@ -65,6 +65,7 @@ class UserView:
     def add_user(self):
         self.add_user_window = tk.Toplevel(self.root)
         self.add_user_window.title("Add User")
+        self.add_user_window.geometry("300x300")
 
         tk.Label(self.add_user_window, text="Username").pack(pady=5)
         self.username_entry = tk.Entry(self.add_user_window)
@@ -99,6 +100,7 @@ class UserView:
 
         self.update_user_window = tk.Toplevel(self.root)
         self.update_user_window.title("Update User")
+        self.update_user_window.geometry("300x300")
 
         tk.Label(self.update_user_window, text="Username").pack(pady=5)
         self.username_entry = tk.Entry(self.update_user_window)
