@@ -14,6 +14,9 @@ class TodoView:
         self.user = self.auth_controller.user_model.find_user(username)
         self.todos = list(self.todo_model.get_todos(self.user['_id']))
 
+        self.todos_per_page = 10
+        self.current_page = 1
+
         self.todos_frame = tk.Frame(root)
         self.todos_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -27,7 +30,7 @@ class TodoView:
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
 
         # Treeview for displaying todos
-        self.tree = ttk.Treeview(self.tree_frame, columns=("title", "description", "status","actions"), show="headings")
+        self.tree = ttk.Treeview(self.tree_frame, columns=("title", "description", "status", "actions"), show="headings")
         self.tree.heading("title", text="Title")
         self.tree.heading("description", text="Description")
         self.tree.heading("status", text="Status")
@@ -37,15 +40,32 @@ class TodoView:
 
         self.tree.bind("<ButtonRelease-1>", self.on_tree_select)
 
+        # Pagination controls
+        self.pagination_frame = tk.Frame(self.todos_frame)
+        self.pagination_frame.pack(pady=10)
+        self.prev_button = tk.Button(self.pagination_frame, text="Previous", command=self.prev_page)
+        self.prev_button.pack(side=tk.LEFT, padx=5)
+        self.next_button = tk.Button(self.pagination_frame, text="Next", command=self.next_page)
+        self.next_button.pack(side=tk.LEFT, padx=5)
+
+        self.page_label = tk.Label(self.pagination_frame, text=f"Page {self.current_page}")
+        self.page_label.pack(side=tk.LEFT, padx=5)
+
         self.load_todos()
 
     def load_todos(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
-        self.todos = list(self.todo_model.get_todos(self.user['_id']))
-        for todo in self.todos:
+        
+        start = (self.current_page - 1) * self.todos_per_page
+        end = start + self.todos_per_page
+        current_todos = self.todos[start:end]
+        
+        for todo in current_todos:
             self.tree.insert("", tk.END, iid=str(todo['_id']),
                              values=(todo['title'], todo['description'], todo.get('status', 'NA'), 'Edit/Delete'))
+
+        self.update_pagination_controls()
 
     def add_todo(self):
         # Create a new top-level window for adding a todo
@@ -64,7 +84,7 @@ class TodoView:
 
         # Status label and combobox
         tk.Label(self.add_todo_window, text="Status").pack(pady=5)
-        self.status_combobox = ttk.Combobox(self.add_todo_window, values=["completed", "active", "domant"])
+        self.status_combobox = ttk.Combobox(self.add_todo_window, values=["completed", "active", "dormant"])
         self.status_combobox.current(1)  # Set default status to 'active'
         self.status_combobox.pack(pady=5)
 
@@ -80,6 +100,7 @@ class TodoView:
             status = self.status_combobox.get()
             if title and description and status:
                 self.todo_model.add_todo(user["_id"], title, description, status)
+                self.todos = list(self.todo_model.get_todos(self.user['_id']))
                 self.load_todos()
             else:
                 messagebox.showwarning("Input Error", "Please enter all fields.")
@@ -108,7 +129,7 @@ class TodoView:
 
         # Status label and combobox
         tk.Label(self.update_todo_window, text="Status").pack(pady=5)
-        self.status_combobox = ttk.Combobox(self.update_todo_window, values=["completed", "active", "domant"])
+        self.status_combobox = ttk.Combobox(self.update_todo_window, values=["completed", "active", "dormant"])
         self.status_combobox.set(todo.get('status', 'No status'))
         self.status_combobox.pack(pady=5)
 
@@ -122,6 +143,7 @@ class TodoView:
         new_status = self.status_combobox.get()
         if new_title and new_description and new_status:
             self.todo_model.update_todo(todo_id, new_title, new_description, new_status)
+            self.todos = list(self.todo_model.get_todos(self.user['_id']))
             self.load_todos()
         else:
             messagebox.showwarning("Input Error", "Please enter both title and description.")
@@ -129,6 +151,7 @@ class TodoView:
 
     def delete_todo(self, todo_id):
         self.todo_model.delete_todo(todo_id)
+        self.todos = list(self.todo_model.get_todos(self.user['_id']))
         self.load_todos()
 
     def on_tree_select(self, event):
@@ -153,3 +176,18 @@ class TodoView:
     def confirm_delete(self, todo_id):
         if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this todo?"):
             self.delete_todo(todo_id)
+
+    def prev_page(self):
+        if self.current_page > 1:
+            self.current_page -= 1
+            self.load_todos()
+
+    def next_page(self):
+        if self.current_page * self.todos_per_page < len(self.todos):
+            self.current_page += 1
+            self.load_todos()
+
+    def update_pagination_controls(self):
+        self.page_label.config(text=f"Page {self.current_page}")
+        self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
+        self.next_button.config(state=tk.NORMAL if self.current_page * self.todos_per_page < len(self.todos) else tk.DISABLED)
