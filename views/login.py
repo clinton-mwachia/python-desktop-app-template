@@ -30,15 +30,22 @@ class LoginView:
     def login(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
-        if self.auth_controller.login(username, password):
-            self.on_login_success(username)
+        if username and password:
+            if self.auth_controller.login(username, password):
+                self.on_login_success(username)
+            else:
+                messagebox.showerror("Login Failed", "Invalid username or password")
         else:
-            messagebox.showerror("Login Failed", "Invalid username or password")
+            messagebox.showerror("Login Failed", "Please enter username and password")
 
     def register(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
-        if self.auth_controller.register(username, password):
-            messagebox.showinfo("Registration Successful", "You can now log in")
+        
+        if username and password:
+            if self.auth_controller.register(username, password):
+                messagebox.showinfo("Registration Successful", "You can now log in")
+            else:
+                messagebox.showerror("Registration Failed", "Username already exists")
         else:
-            messagebox.showerror("Registration Failed", "Username already exists")
+            messagebox.showerror("Registration Failed", "please provide the Username and password")
