@@ -17,6 +17,10 @@ class TodoView:
         self.auth_controller = AuthController()
         self.user = self.auth_controller.user_model.find_user(username)
 
+        # search query and filter
+        self.search_query = ""
+        self.search_timer = None
+
         self.todos_frame = tk.Frame(root)
         self.todos_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -26,6 +30,17 @@ class TodoView:
     def setup_todos_frame(self):
         self.add_button = tk.Button(self.todos_frame, text="Add Todo", command=self.add_todo)
         self.add_button.pack(pady=10)
+
+        # search input
+        self.search_frame = tk.Frame(self.todos_frame)
+        self.search_frame.pack(pady=5)
+
+        self.search_entry = tk.Entry(self.search_frame)
+        self.search_entry.pack(pady=5)
+        self.search_entry.bind("<KeyRelease>", self.on_search)
+        self.search_entry.insert(0, "Search Todos")
+        self.search_entry.bind("<FocusIn>", lambda event: self.clear_placeholder(event, "Search Todos"))
+        self.search_entry.bind("<FocusOut>", lambda event: self.set_placeholder(event, "Search Todos"))
 
         self.tree_frame = tk.Frame(self.todos_frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
@@ -52,6 +67,25 @@ class TodoView:
         self.next_button = tk.Button(self.pagination_frame, text="Next", command=self.next_page)
         self.next_button.pack(side=tk.LEFT)
 
+    def on_search(self, event):
+        if self.search_timer:
+            self.root.after_cancel(self.search_timer)
+        self.search_timer = self.root.after(300, self.update_search_query)
+
+    def update_search_query(self):
+        self.search_query = self.search_entry.get()
+        self.load_todos()
+
+    def clear_placeholder(self, event, placeholder_text):
+        if event.widget.get() == placeholder_text:
+            event.widget.delete(0, tk.END)
+            event.widget.config(fg="black")
+
+    def set_placeholder(self, event, placeholder_text):
+        if event.widget.get() == "":
+            event.widget.insert(0, placeholder_text)
+            event.widget.config(fg="grey")
+
     def load_todos(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -59,15 +93,21 @@ class TodoView:
         total_todos = self.todo_model.collection.count_documents({"user_id": self.user['_id']})
         start = (self.current_page - 1) * self.page_size
         todos = self.todo_model.collection.find({"user_id": self.user['_id']}).skip(start).limit(self.page_size)
+        filtered_todos = [todo for todo in todos if self.search_query.lower() in todo['title'].lower()]
 
-        for todo in todos:
-            self.tree.insert("", tk.END, iid=str(todo['_id']),
+        if not filtered_todos:
+            self.tree.insert("", tk.END, iid="no_todo", values=("No todos found", "", "", ""))
+            self.prev_button.config(state=tk.DISABLED)
+            self.next_button.config(state=tk.DISABLED)
+        else:
+            for todo in filtered_todos[start:start + self.page_size]:
+                self.tree.insert("", tk.END, iid=str(todo['_id']),
                              values=(todo['title'], todo['description'], todo.get('status', 'NA'), 'Edit/Delete'))
 
-        self.page_label.config(text=f"Page {self.current_page}")
-        self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
-        self.next_button.config(state=tk.NORMAL if self.current_page * self.page_size < total_todos else tk.DISABLED)
-
+            self.page_label.config(text=f"Page {self.current_page}")
+            self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
+            self.next_button.config(state=tk.NORMAL if self.current_page * self.page_size < total_todos else tk.DISABLED)
+        
     def add_todo(self):
         self.add_todo_window = tk.Toplevel(self.root)
         self.add_todo_window.title("Add Todo")
