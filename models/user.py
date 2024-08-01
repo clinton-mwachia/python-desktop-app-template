@@ -5,8 +5,8 @@ class UserModel:
     def __init__(self):
         self.collection = Database('todo_app').get_collection('users')
 
-    def create_user(self, username, password, email=None):
-        user = {"username": username, "password": password, "email": email, "active": True}
+    def create_user(self, username, password, email=None, role=None):
+        user = {"username": username, "password": password, "email": email, "active": True, "role": role}
         self.collection.insert_one(user)
 
     def find_user(self, username):
