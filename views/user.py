@@ -18,6 +18,9 @@ class UserView:
         self.search_query = ""
         self.search_timer = None
 
+        # filter status
+        self.filter_status = "All"
+
         self.setup_users_frame()
         self.load_users()  # Load users after setting up the UI
 
@@ -29,6 +32,7 @@ class UserView:
         self.search_frame = tk.Frame(self.users_frame)
         self.search_frame.pack(pady=5)
 
+        tk.Label(self.search_frame, text="Status:").pack(side=tk.LEFT, padx=5)
         self.search_entry = tk.Entry(self.search_frame)
         self.search_entry.pack(pady=5)
         self.search_entry.bind("<KeyRelease>", self.on_search)
@@ -36,13 +40,24 @@ class UserView:
         self.search_entry.bind("<FocusIn>", lambda event: self.clear_placeholder(event, "Search Users"))
         self.search_entry.bind("<FocusOut>", lambda event: self.set_placeholder(event, "Search Users"))
 
+        # filter input
+        self.filter_frame = tk.Frame(self.users_frame)
+        self.filter_frame.pack(pady=5)
+
+        tk.Label(self.filter_frame, text="Role:").pack(side=tk.LEFT, padx=5)
+        self.role_combobox = ttk.Combobox(self.filter_frame, values=["All", "admin", "user"])
+        self.role_combobox.set("All")
+        self.role_combobox.pack(side=tk.LEFT)
+        self.role_combobox.bind("<<ComboboxSelected>>", self.on_filter_change)
+
         self.tree_frame = tk.Frame(self.users_frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.tree = ttk.Treeview(self.tree_frame, columns=("username", "email", "active", "actions"), show="headings")
+        self.tree = ttk.Treeview(self.tree_frame, columns=("username", "email", "active", "role","actions"), show="headings")
         self.tree.heading("username", text="Username")
         self.tree.heading("email", text="Email")
-        self.tree.heading("active", text="Status")
+        self.tree.heading("active", text="Active")
+        self.tree.heading("role", text="Role")
         self.tree.heading("actions", text="Actions")
         self.tree.column("actions", width=150, anchor=tk.CENTER)
         self.tree.pack(fill=tk.BOTH, expand=True)
@@ -70,6 +85,10 @@ class UserView:
         self.search_query = self.search_entry.get()
         self.load_users()
 
+    def on_filter_change(self, event):
+        self.filter_status = self.role_combobox.get()
+        self.load_users()
+
     def load_users(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -79,6 +98,11 @@ class UserView:
         users = self.user_model.collection.find().skip(start).limit(self.page_size)
         filtered_users = [user for user in users if self.search_query.lower() in user['username'].lower()]
 
+        # filter users based on filter
+        if self.filter_status != "All":
+            filtered_users = [user for user in filtered_users if user.get('role', '') == self.filter_status]
+
+
         if not filtered_users:
                     self.tree.insert("", tk.END, iid="no_user", values=("No users found", "", "", ""))
                     self.prev_button.config(state=tk.DISABLED)
@@ -86,7 +110,7 @@ class UserView:
         else:
             for user in filtered_users:
                 self.tree.insert("", tk.END, iid=str(user['_id']),
-                             values=(user['username'], user.get('email', 'No email'), 'Edit/Delete'))
+                             values=(user['username'], user.get('email', 'No email'), user.get('active',''), user.get('role',''),'Edit/Delete'))
 
             self.page_label.config(text=f"Page {self.current_page}")
             self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
@@ -109,6 +133,11 @@ class UserView:
         self.email_entry = tk.Entry(self.add_user_window)
         self.email_entry.pack(pady=5)
 
+        tk.Label(self.add_user_window, text="Role").pack(pady=5)
+        self.role_combobox = ttk.Combobox(self.add_user_window, values=["admin", "user"])
+        self.role_combobox.current(1)  # Set default role to 'user'
+        self.role_combobox.pack(pady=5)
+
         add_button = tk.Button(self.add_user_window, text="Add", command=self.save_user)
         add_button.pack(pady=10)
 
@@ -116,11 +145,12 @@ class UserView:
         username = self.username_entry.get()
         password = self.password_entry.get()
         email = self.email_entry.get()
-        if username and password:
-            self.user_model.create_user(username, password, email)
+        role = self.role_combobox.get()
+        if username and password and role:
+            self.user_model.create_user(username, password, email, role)
             self.load_users()
         else:
-            messagebox.showwarning("Input Error", "Please enter both username and password.")
+            messagebox.showwarning("Input Error", "Please enter all fields.")
         self.add_user_window.destroy()
 
     def update_user(self, user_id):
@@ -147,6 +177,11 @@ class UserView:
         self.email_entry.insert(0, user.get('email', ''))
         self.email_entry.pack(pady=5)
 
+        tk.Label(self.update_user_window, text="Status").pack(pady=5)
+        self.role_combobox = ttk.Combobox(self.update_user_window, values=["admin", "user"])
+        self.role_combobox.set(user.get('role', 'No role'))
+        self.role_combobox.pack(pady=5)
+
         save_button = tk.Button(self.update_user_window, text="Save", command=lambda: self.save_updated_user(user_id))
         save_button.pack(pady=10)
 
@@ -154,11 +189,12 @@ class UserView:
         new_username = self.username_entry.get()
         new_password = self.password_entry.get()
         new_email = self.email_entry.get()
+        new_role = self.role_combobox.get()
         if new_username and new_password:
-            self.user_model.update_user(user_id, username=new_username, email=new_email)
+            self.user_model.update_user(user_id, username=new_username, email=new_email, role=new_role)
             self.load_users()
         else:
-            messagebox.showwarning("Input Error", "Please enter both username and password.")
+            messagebox.showwarning("Input Error", "Please enter required fields.")
         self.update_user_window.destroy()
 
     def delete_user(self, user_id):
