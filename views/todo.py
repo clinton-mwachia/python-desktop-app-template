@@ -21,6 +21,9 @@ class TodoView:
         self.search_query = ""
         self.search_timer = None
 
+        # filter status
+        self.filter_status = "All"
+
         self.todos_frame = tk.Frame(root)
         self.todos_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -35,12 +38,23 @@ class TodoView:
         self.search_frame = tk.Frame(self.todos_frame)
         self.search_frame.pack(pady=5)
 
+        tk.Label(self.search_frame, text="Search:").pack(side=tk.LEFT, padx=5)
         self.search_entry = tk.Entry(self.search_frame)
         self.search_entry.pack(pady=5)
         self.search_entry.bind("<KeyRelease>", self.on_search)
         self.search_entry.insert(0, "Search Todos")
         self.search_entry.bind("<FocusIn>", lambda event: self.clear_placeholder(event, "Search Todos"))
         self.search_entry.bind("<FocusOut>", lambda event: self.set_placeholder(event, "Search Todos"))
+
+        # filter input
+        self.filter_frame = tk.Frame(self.todos_frame)
+        self.filter_frame.pack(pady=5)
+
+        tk.Label(self.filter_frame, text="Status:").pack(side=tk.LEFT, padx=5)
+        self.status_combobox = ttk.Combobox(self.filter_frame, values=["All", "completed", "active", "domant"])
+        self.status_combobox.set("All")
+        self.status_combobox.pack(side=tk.LEFT)
+        self.status_combobox.bind("<<ComboboxSelected>>", self.on_filter_change)
 
         self.tree_frame = tk.Frame(self.todos_frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
@@ -86,6 +100,10 @@ class TodoView:
             event.widget.insert(0, placeholder_text)
             event.widget.config(fg="grey")
 
+    def on_filter_change(self, event):
+        self.filter_status = self.status_combobox.get()
+        self.load_todos()
+
     def load_todos(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -94,6 +112,11 @@ class TodoView:
         start = (self.current_page - 1) * self.page_size
         todos = self.todo_model.collection.find({"user_id": self.user['_id']}).skip(start).limit(self.page_size)
         filtered_todos = [todo for todo in todos if self.search_query.lower() in todo['title'].lower()]
+
+        # filter todo based on filter
+        if self.filter_status != "All":
+            filtered_todos = [todo for todo in filtered_todos if todo.get('status', '') == self.filter_status]
+
 
         if not filtered_todos:
             self.tree.insert("", tk.END, iid="no_todo", values=("No todos found", "", "", ""))
