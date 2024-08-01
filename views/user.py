@@ -14,12 +14,27 @@ class UserView:
         self.users_frame = tk.Frame(root)
         self.users_frame.pack(fill=tk.BOTH, expand=True)
 
+        # search query
+        self.search_query = ""
+        self.search_timer = None
+
         self.setup_users_frame()
         self.load_users()  # Load users after setting up the UI
 
     def setup_users_frame(self):
         self.add_button = tk.Button(self.users_frame, text="Add User", command=self.add_user)
         self.add_button.pack(pady=10)
+
+        # search input
+        self.search_frame = tk.Frame(self.users_frame)
+        self.search_frame.pack(pady=5)
+
+        self.search_entry = tk.Entry(self.search_frame)
+        self.search_entry.pack(pady=5)
+        self.search_entry.bind("<KeyRelease>", self.on_search)
+        self.search_entry.insert(0, "Search Users")
+        self.search_entry.bind("<FocusIn>", lambda event: self.clear_placeholder(event, "Search Users"))
+        self.search_entry.bind("<FocusOut>", lambda event: self.set_placeholder(event, "Search Users"))
 
         self.tree_frame = tk.Frame(self.users_frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
@@ -46,6 +61,15 @@ class UserView:
         self.next_button = tk.Button(self.pagination_frame, text="Next", command=self.next_page)
         self.next_button.pack(side=tk.LEFT)
 
+    def on_search(self, event):
+        if self.search_timer:
+            self.root.after_cancel(self.search_timer)
+        self.search_timer = self.root.after(300, self.update_search_query)
+
+    def update_search_query(self):
+        self.search_query = self.search_entry.get()
+        self.load_users()
+
     def load_users(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -53,15 +77,21 @@ class UserView:
         total_users = self.user_model.collection.count_documents({})
         start = (self.current_page - 1) * self.page_size
         users = self.user_model.collection.find().skip(start).limit(self.page_size)
+        filtered_users = [user for user in users if self.search_query.lower() in user['username'].lower()]
 
-        for user in users:
-            self.tree.insert("", tk.END, iid=str(user['_id']),
+        if not filtered_users:
+                    self.tree.insert("", tk.END, iid="no_user", values=("No users found", "", "", ""))
+                    self.prev_button.config(state=tk.DISABLED)
+                    self.next_button.config(state=tk.DISABLED)
+        else:
+            for user in filtered_users:
+                self.tree.insert("", tk.END, iid=str(user['_id']),
                              values=(user['username'], user.get('email', 'No email'), 'Edit/Delete'))
 
-        self.page_label.config(text=f"Page {self.current_page}")
-        self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
-        self.next_button.config(state=tk.NORMAL if self.current_page * self.page_size < total_users else tk.DISABLED)
-
+            self.page_label.config(text=f"Page {self.current_page}")
+            self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
+            self.next_button.config(state=tk.NORMAL if self.current_page * self.page_size < total_users else tk.DISABLED)
+    
     def add_user(self):
         self.add_user_window = tk.Toplevel(self.root)
         self.add_user_window.title("Add User")
@@ -168,3 +198,14 @@ class UserView:
         if self.current_page * self.page_size < total_users:
             self.current_page += 1
             self.load_users()
+
+    # search clear placeholder
+    def clear_placeholder(self, event, placeholder_text):
+        if event.widget.get() == placeholder_text:
+            event.widget.delete(0, tk.END)
+            event.widget.config(fg="black")
+
+    def set_placeholder(self, event, placeholder_text):
+        if event.widget.get() == "":
+            event.widget.insert(0, placeholder_text)
+            event.widget.config(fg="grey")
