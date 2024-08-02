@@ -21,6 +21,9 @@ class UserView:
         # filter status
         self.filter_status = "All"
 
+        # sort
+        self.sort_by = "username"
+
         self.setup_users_frame()
         self.load_users()  # Load users after setting up the UI
 
@@ -44,11 +47,18 @@ class UserView:
         self.filter_frame = tk.Frame(self.users_frame)
         self.filter_frame.pack(pady=5)
 
-        tk.Label(self.filter_frame, text="Role:").pack(side=tk.LEFT, padx=5)
+        tk.Label(self.filter_frame, text="Filter by Role:").pack(side=tk.LEFT, padx=5)
         self.role_combobox = ttk.Combobox(self.filter_frame, values=["All", "admin", "user"])
         self.role_combobox.set("All")
         self.role_combobox.pack(side=tk.LEFT)
         self.role_combobox.bind("<<ComboboxSelected>>", self.on_filter_change)
+
+        # sorting frame
+        tk.Label(self.filter_frame, text="Sort By:").pack(side=tk.LEFT, padx=5)
+        self.sort_combobox = ttk.Combobox(self.filter_frame, values=["NONE", "username", "role"])
+        self.sort_combobox.set("NONE")
+        self.sort_combobox.pack(side=tk.LEFT)
+        self.sort_combobox.bind("<<ComboboxSelected>>", self.on_sort_change)
 
         self.tree_frame = tk.Frame(self.users_frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
@@ -89,6 +99,10 @@ class UserView:
         self.filter_status = self.role_combobox.get()
         self.load_users()
 
+    def on_sort_change(self, event):
+        self.sort_by = self.sort_combobox.get()
+        self.load_users()
+
     def load_users(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -102,6 +116,13 @@ class UserView:
         if self.filter_status != "All":
             filtered_users = [user for user in filtered_users if user.get('role', '') == self.filter_status]
 
+        # handle sorting
+        if self.sort_by == "NONE":
+            filtered_users
+        elif self.sort_by == "username":
+                    filtered_users.sort(key=lambda x: x['username'])
+        elif self.sort_by == "role":
+                    filtered_users.sort(key=lambda x: x.get('role', ''))
 
         if not filtered_users:
                     self.tree.insert("", tk.END, iid="no_user", values=("No users found", "", "", ""))
