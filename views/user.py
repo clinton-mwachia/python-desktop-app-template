@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from models.user import UserModel
 from bson.objectid import ObjectId
+import csv
 
 class UserView:
     def __init__(self, root):
@@ -28,9 +29,18 @@ class UserView:
         self.load_users()  # Load users after setting up the UI
 
     def setup_users_frame(self):
-        self.add_button = tk.Button(self.users_frame, text="Add User", command=self.add_user)
-        self.add_button.pack(pady=10)
+         # creating buttons frame
+        self.button_frame = tk.Frame(self.users_frame)
+        self.button_frame.pack()
 
+        # add todo button
+        self.add_button = tk.Button(self.button_frame, text="Add User", command=self.add_user)
+        self.add_button.pack(side=tk.LEFT, pady=5)
+
+        # export to csv button
+        self.export_csv_button = tk.Button(self.button_frame, text="Export to CSV", command=self.export_to_csv)
+        self.export_csv_button.pack(side=tk.LEFT, pady=5)
+       
         # search input
         self.search_frame = tk.Frame(self.users_frame)
         self.search_frame.pack(pady=5)
@@ -102,6 +112,24 @@ class UserView:
     def on_sort_change(self, event):
         self.sort_by = self.sort_combobox.get()
         self.load_users()
+
+    def export_to_csv(self):
+        users = self.user_model.collection.find()
+        filtered_users = [user for user in users if self.search_query.lower() in user['username'].lower()]
+
+        if self.filter_status != "All":
+            filtered_users = [user for user in filtered_users if user.get('role', '') == self.filter_status]
+
+        with open('users.csv', 'w', newline='') as csvfile:
+            fieldnames = ['Username', 'Email', 'Active', 'Role' ]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            for user in filtered_users:
+                writer.writerow({'Username': user['username'], 'Email': user['email'], 'Active': user.get('active',''), 'Role': user.get('role', '')})
+
+        messagebox.showinfo("Export to CSV", "Users have been exported to users.csv")
+
 
     def load_users(self):
         for item in self.tree.get_children():
