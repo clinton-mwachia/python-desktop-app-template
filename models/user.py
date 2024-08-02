@@ -16,12 +16,14 @@ class UserModel:
         user = self.find_user(username)
         return user and user['password'] == password
 
-    def update_user(self, user_id, username=None, email=None):
+    def update_user(self, user_id, username=None, email=None, role=None):
         update_fields = {}
         if username:
             update_fields['username'] = username
         if email:
             update_fields['email'] = email
+        if role:
+            update_fields['role'] = role
         if update_fields:
             self.collection.update_one({"_id": ObjectId(user_id)}, {"$set": update_fields})
 
