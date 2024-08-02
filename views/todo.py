@@ -4,6 +4,7 @@ from tkinter import ttk
 from models.todo import TodoModel
 from auth.auth import AuthController
 from bson.objectid import ObjectId
+from views.notification import NotificationManager
 import csv
 
 class TodoView:
@@ -27,6 +28,13 @@ class TodoView:
 
         # sort
         self.sort_by = "title"
+
+        # notification manager
+        # Create a frame for the toolbar
+        self.toolbar_frame = tk.Frame(root)
+        self.toolbar_frame.pack(fill=tk.X)
+
+        self.notification_manager = NotificationManager(self.toolbar_frame)
 
         self.todos_frame = tk.Frame(root)
         self.todos_frame.pack(fill=tk.BOTH, expand=True)
@@ -207,6 +215,7 @@ class TodoView:
         if title and description and status:
             self.todo_model.add_todo(self.user['_id'], title, description, status)
             self.load_todos()
+            self.notification_manager.add_notification(f"New todo added: {title}")
         else:
             messagebox.showwarning("Input Error", "Please enter all fields.")
         self.add_todo_window.destroy()
@@ -245,6 +254,7 @@ class TodoView:
         if new_title and new_description and new_status:
             self.todo_model.update_todo(todo_id, new_title, new_description, new_status)
             self.load_todos()
+            self.notification_manager.add_notification(f"todo updated: {new_title}")
         else:
             messagebox.showwarning("Input Error", "Please enter all fields.")
         self.update_todo_window.destroy()
@@ -253,6 +263,7 @@ class TodoView:
         if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this todo?"):
             self.todo_model.delete_todo(todo_id)
             self.load_todos()
+            self.notification_manager.add_notification(f"todo deleted: {todo_id}")
 
     def on_tree_select(self, event):
         selected_item = self.tree.selection()

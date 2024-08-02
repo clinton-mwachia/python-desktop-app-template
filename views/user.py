@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import ttk
 from models.user import UserModel
 from bson.objectid import ObjectId
+from views.notification import NotificationManager
 import csv
 
 class UserView:
@@ -11,9 +12,6 @@ class UserView:
         self.user_model = UserModel()
         self.page_size = 10
         self.current_page = 1
-
-        self.users_frame = tk.Frame(root)
-        self.users_frame.pack(fill=tk.BOTH, expand=True)
 
         # search query
         self.search_query = ""
@@ -24,6 +22,16 @@ class UserView:
 
         # sort
         self.sort_by = "username"
+
+        # notification manager
+        # Create a frame for the toolbar
+        self.toolbar_frame = tk.Frame(root)
+        self.toolbar_frame.pack(fill=tk.X)
+
+        self.notification_manager = NotificationManager(self.toolbar_frame)
+
+        self.users_frame = tk.Frame(root)
+        self.users_frame.pack(fill=tk.BOTH, expand=True)
 
         self.setup_users_frame()
         self.load_users()  # Load users after setting up the UI
@@ -198,6 +206,7 @@ class UserView:
         if username and password and role:
             self.user_model.create_user(username, password, email, role)
             self.load_users()
+            self.notification_manager.add_notification(f"New user added: {username}")
         else:
             messagebox.showwarning("Input Error", "Please enter all fields.")
         self.add_user_window.destroy()
@@ -242,6 +251,7 @@ class UserView:
         if new_username and new_password:
             self.user_model.update_user(user_id, username=new_username, email=new_email, role=new_role)
             self.load_users()
+            self.notification_manager.add_notification(f"user {new_username} updated")
         else:
             messagebox.showwarning("Input Error", "Please enter required fields.")
         self.update_user_window.destroy()
@@ -250,6 +260,7 @@ class UserView:
         if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this user?"):
             self.user_model.collection.delete_one({"_id": ObjectId(user_id)})
             self.load_users()
+            self.notification_manager.add_notification(f"user: {user_id} deleted")
 
     def on_tree_select(self, event):
         selected_item = self.tree.selection()
