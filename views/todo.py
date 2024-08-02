@@ -4,6 +4,7 @@ from tkinter import ttk
 from models.todo import TodoModel
 from auth.auth import AuthController
 from bson.objectid import ObjectId
+import csv
 
 class TodoView:
     def __init__(self, root, username):
@@ -34,8 +35,17 @@ class TodoView:
         self.load_todos()  # Load todos after setting up the UI
 
     def setup_todos_frame(self):
-        self.add_button = tk.Button(self.todos_frame, text="Add Todo", command=self.add_todo)
-        self.add_button.pack(pady=10)
+        # creating buttons frame
+        self.button_frame = tk.Frame(self.todos_frame)
+        self.button_frame.pack()
+
+        # add todo button
+        self.add_button = tk.Button(self.button_frame, text="Add Todo", command=self.add_todo)
+        self.add_button.pack(side=tk.LEFT, pady=5)
+
+        # export to csv button
+        self.export_csv_button = tk.Button(self.button_frame, text="Export to CSV", command=self.export_to_csv)
+        self.export_csv_button.pack(side=tk.LEFT, pady=5)
 
         # search input
         self.search_frame = tk.Frame(self.todos_frame)
@@ -117,6 +127,23 @@ class TodoView:
     def on_sort_change(self, event):
         self.sort_by = self.sort_combobox.get()
         self.load_todos()
+
+    def export_to_csv(self):
+        todos = self.todo_model.collection.find({"user_id": self.user['_id']})
+        filtered_todos = [todo for todo in todos if self.search_query.lower() in todo['title'].lower()]
+
+        if self.filter_status != "All":
+            filtered_todos = [todo for todo in filtered_todos if todo.get('status', '') == self.filter_status]
+
+        with open('todos.csv', 'w', newline='') as csvfile:
+            fieldnames = ['Title', 'Description', 'Status']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            for todo in filtered_todos:
+                writer.writerow({'Title': todo['title'], 'Description': todo['description'], 'Status': todo.get('status','')})
+
+        messagebox.showinfo("Export to CSV", "Todos have been exported to todos.csv")
 
     def load_todos(self):
         for item in self.tree.get_children():
