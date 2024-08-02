@@ -1,11 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 import json
 import os
 
 class NotificationManager:
     def __init__(self, parent_frame):
+        # notifications and settings manager
         self.notifications_file = "notifications.json"
+        self.settings_file = "settings.json"
+        self.settings = self.load_settings()
         self.notifications = self.load_notifications()
         
         # Load the notification icon
@@ -24,6 +28,14 @@ class NotificationManager:
         else:
             self.notification_count_label.place_forget()  # Hide the label initially
 
+         # Add settings button
+        self.settings_button = tk.Button(parent_frame, text="Settings", command=self.open_settings)
+        self.settings_button.pack(side=tk.RIGHT, padx=10)
+
+        # Apply settings
+        self.apply_settings()
+
+    # notifications functions
     def add_notification(self, message):
         self.notifications.append(message)
         self.save_notifications()
@@ -65,3 +77,49 @@ class NotificationManager:
     def update_notification_count(self):
         self.notification_count_label.config(text=f"{len(self.notifications)}")
         self.notification_count_label.place(relx=0.98, rely=0.1) 
+
+    # settings functions
+    def open_settings(self):
+        self.settings_window = tk.Toplevel()
+        self.settings_window.title("Settings")
+        self.settings_window.geometry("400x300")
+        
+        tk.Label(self.settings_window, text="Theme").pack(pady=5)
+        self.theme_var = tk.StringVar(value=self.settings.get("theme", "Light"))
+        theme_options = ["Light", "Dark"]
+        self.theme_combobox = ttk.Combobox(self.settings_window, textvariable=self.theme_var, values=theme_options)
+        self.theme_combobox.pack(pady=5)
+
+        tk.Label(self.settings_window, text="Add settings").pack(pady=5)
+        
+        save_button = tk.Button(self.settings_window, text="Save", command=self.save_settings)
+        save_button.pack(pady=10)
+
+    def save_settings(self):
+        self.settings["theme"] = self.theme_var.get()
+        self.apply_settings()
+        self.settings_window.destroy()
+        self.save_settings_to_file()
+
+    def apply_settings(self):
+        theme = self.settings.get("theme", "Light")
+        
+        if theme == "Dark":
+            self.notification_button.config(bg="black", fg="white")
+            self.notification_count_label.config(bg="black", fg="white")
+            self.settings_button.config(bg="black", fg="white")
+        else:
+            self.notification_button.config(bg="white", fg="black")
+            self.notification_count_label.config(bg="white", fg="black")
+            self.settings_button.config(bg="white", fg="black")
+
+    def load_settings(self):
+        if os.path.exists(self.settings_file):
+            with open(self.settings_file, "r") as file:
+                return json.load(file)
+        return {}
+
+    def save_settings_to_file(self):
+        with open(self.settings_file, "w") as file:
+            json.dump(self.settings, file)
+
