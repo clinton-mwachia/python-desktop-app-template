@@ -24,6 +24,9 @@ class TodoView:
         # filter status
         self.filter_status = "All"
 
+        # sort
+        self.sort_by = "title"
+
         self.todos_frame = tk.Frame(root)
         self.todos_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -50,11 +53,18 @@ class TodoView:
         self.filter_frame = tk.Frame(self.todos_frame)
         self.filter_frame.pack(pady=5)
 
-        tk.Label(self.filter_frame, text="Status:").pack(side=tk.LEFT, padx=5)
+        tk.Label(self.filter_frame, text="Filter By Status:").pack(side=tk.LEFT, padx=5)
         self.status_combobox = ttk.Combobox(self.filter_frame, values=["All", "completed", "active", "domant"])
         self.status_combobox.set("All")
         self.status_combobox.pack(side=tk.LEFT)
         self.status_combobox.bind("<<ComboboxSelected>>", self.on_filter_change)
+
+        # sorting frame
+        tk.Label(self.filter_frame, text="Sort By:").pack(side=tk.LEFT, padx=5)
+        self.sort_combobox = ttk.Combobox(self.filter_frame, values=["NONE", "title", "status"])
+        self.sort_combobox.set("NONE")
+        self.sort_combobox.pack(side=tk.LEFT)
+        self.sort_combobox.bind("<<ComboboxSelected>>", self.on_sort_change)
 
         self.tree_frame = tk.Frame(self.todos_frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
@@ -104,6 +114,10 @@ class TodoView:
         self.filter_status = self.status_combobox.get()
         self.load_todos()
 
+    def on_sort_change(self, event):
+        self.sort_by = self.sort_combobox.get()
+        self.load_todos()
+
     def load_todos(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -117,6 +131,13 @@ class TodoView:
         if self.filter_status != "All":
             filtered_todos = [todo for todo in filtered_todos if todo.get('status', '') == self.filter_status]
 
+        # handle sorting
+        if self.sort_by == "NONE":
+            filtered_todos
+        elif self.sort_by == "title":
+                    filtered_todos.sort(key=lambda x: x['title'])
+        elif self.sort_by == "status":
+                    filtered_todos.sort(key=lambda x: x.get('status', ''))
 
         if not filtered_todos:
             self.tree.insert("", tk.END, iid="no_todo", values=("No todos found", "", "", ""))
