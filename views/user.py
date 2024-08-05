@@ -199,10 +199,10 @@ class UserView:
         add_button.pack(pady=10)
 
     def save_user(self):
-        username = self.username_entry.get()
-        password = self.password_entry.get()
-        email = self.email_entry.get()
-        role = self.role_combobox.get()
+        username = self.username_entry.get().lower()
+        password = self.password_entry.get().lower()
+        email = self.email_entry.get().lower()
+        role = self.role_combobox.get().lower()
         if username and password and role:
             self.user_model.create_user(username, password, email, role)
             self.load_users()
@@ -244,10 +244,10 @@ class UserView:
         save_button.pack(pady=10)
 
     def save_updated_user(self, user_id):
-        new_username = self.username_entry.get()
-        new_password = self.password_entry.get()
-        new_email = self.email_entry.get()
-        new_role = self.role_combobox.get()
+        new_username = self.username_entry.get().lower()
+        new_password = self.password_entry.get().lower()
+        new_email = self.email_entry.get().lower()
+        new_role = self.role_combobox.get().lower()
         if new_username and new_password:
             self.user_model.update_user(user_id, username=new_username, email=new_email, role=new_role)
             self.load_users()

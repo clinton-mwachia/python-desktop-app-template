@@ -12,7 +12,7 @@ class TodoView:
         self.root = root
         self.username = username
         self.todo_model = TodoModel()
-        self.page_size = 5
+        self.page_size = 30
         self.current_page = 1
 
         # Get user information from AuthController
@@ -162,9 +162,9 @@ class TodoView:
                     if title:
                         todos_to_add.append({
                             'user_id': self.user['_id'],
-                            'title': title,
-                            'description': description,
-                            'status': status
+                            'title': title.lower(),
+                            'description': description.lower(),
+                            'status': status.lower()
                         })
 
                     if len(todos_to_add) >= 1000:  # Process in chunks
@@ -288,9 +288,9 @@ class TodoView:
         add_button.pack(pady=10)
 
     def save_todo(self):
-        title = self.title_entry.get()
-        description = self.description_entry.get()
-        status = self.status_combobox.get()
+        title = self.title_entry.get().lower()
+        description = self.description_entry.get().lower()
+        status = self.status_combobox.get().lower()
         if title and description and status:
             self.todo_model.add_todo(self.user['_id'], title, description, status)
             self.load_todos()
@@ -327,9 +327,9 @@ class TodoView:
         save_button.pack(pady=10)
 
     def save_updated_todo(self, todo_id):
-        new_title = self.title_entry.get()
-        new_description = self.description_entry.get()
-        new_status = self.status_combobox.get()
+        new_title = self.title_entry.get().lower()
+        new_description = self.description_entry.get().lower()
+        new_status = self.status_combobox.get().lower()
         if new_title and new_description and new_status:
             self.todo_model.update_todo(todo_id, new_title, new_description, new_status)
             self.load_todos()
