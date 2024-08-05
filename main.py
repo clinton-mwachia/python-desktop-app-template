@@ -1,6 +1,7 @@
 import tkinter as tk
 from views.login import LoginView
 from views.dashboard import DashboardView
+from utils.logger import setup_logging
 
 class App:
     def __init__(self, root):
@@ -37,6 +38,10 @@ class App:
             self.login_view.frame.destroy() 
 
 def main():
+    logger = setup_logging()
+      # Your main application code here
+    logger.info("Application started")
+    
     root = tk.Tk()
     app = App(root)
     root.mainloop()
