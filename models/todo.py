@@ -9,6 +9,9 @@ class TodoModel:
         todo = {"user_id": user_id, "title": title, "description": description, 'status':status}
         self.collection.insert_one(todo)
 
+    def add_many_todos(self, todos):
+        self.collection.insert_many(todos)
+
     def get_todos(self, user_id):
         return self.collection.find({"user_id": user_id})
 
