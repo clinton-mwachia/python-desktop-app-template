@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from tkinter import ttk
 from models.todo import TodoModel
 from auth.auth import AuthController
@@ -12,7 +12,7 @@ class TodoView:
         self.root = root
         self.username = username
         self.todo_model = TodoModel()
-        self.page_size = 10
+        self.page_size = 5
         self.current_page = 1
 
         # Get user information from AuthController
@@ -54,6 +54,18 @@ class TodoView:
         # export to csv button
         self.export_csv_button = tk.Button(self.button_frame, text="Export to CSV", command=self.export_to_csv)
         self.export_csv_button.pack(side=tk.LEFT, pady=5)
+
+         # upload data button
+        self.upload_button = tk.Button(self.button_frame, text="Upload CSV", command=self.upload_csv)
+        self.upload_button.pack(side=tk.LEFT, pady=5)
+
+        # Add the progress bar frame
+        self.progress_frame = tk.Frame(self.todos_frame)
+        self.progress_frame.pack()
+
+        # Add the progress bar
+        self.progress_bar = ttk.Progressbar(self.progress_frame, orient="horizontal", length=300, mode="determinate")
+        self.progress_bar.pack(side=tk.LEFT, pady=5)
 
         # search input
         self.search_frame = tk.Frame(self.todos_frame)
@@ -108,6 +120,73 @@ class TodoView:
 
         self.next_button = tk.Button(self.pagination_frame, text="Next", command=self.next_page)
         self.next_button.pack(side=tk.LEFT)
+
+    def upload_csv(self):
+        file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+        if not file_path:
+            return
+        self.preview_csv(file_path)
+
+    def preview_csv(self, file_path):
+        # Create a preview window to show the CSV content
+        self.preview_window = tk.Toplevel(self.root)
+        self.preview_window.title("CSV Preview")
+        
+        # Add a text widget to show CSV preview
+        self.preview_text = tk.Text(self.preview_window)
+        self.preview_text.pack(pady=10)
+        
+        with open(file_path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                self.preview_text.insert(tk.END, ', '.join(row) + '\n')
+
+        # Add buttons to confirm or cancel
+        tk.Button(self.preview_window, text="Confirm", command=lambda: self.bulk_add_from_csv(file_path)).pack(pady=5)
+        tk.Button(self.preview_window, text="Cancel", command=self.preview_window.destroy).pack(pady=5)
+
+    def bulk_add_from_csv(self, file_path):
+        todos_to_add = []
+        total_lines = sum(1 for line in open(file_path, 'r')) - 1  # Exclude header line
+        
+        self.progress_bar['maximum'] = total_lines
+        self.progress_bar['value'] = 0
+        
+        try:
+            with open(file_path, newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for index, row in enumerate(reader):
+                    title = row.get('title', '').strip()
+                    description = row.get('description', '').strip()
+                    status = row.get('status', '').strip()
+                    if title:
+                        todos_to_add.append({
+                            'user_id': self.user['_id'],
+                            'title': title,
+                            'description': description,
+                            'status': status
+                        })
+
+                    if len(todos_to_add) >= 1000:  # Process in chunks
+                        self.todo_model.add_many_todos(todos_to_add)
+                        todos_to_add = []
+                        self.progress_bar['value'] = index + 1
+                        self.root.update_idletasks()
+
+            if todos_to_add:
+                self.todo_model.add_many_todos(todos_to_add)
+
+            self.progress_bar['value'] = total_lines
+            self.root.update_idletasks()
+
+            self.load_todos()
+            messagebox.showinfo("Success", "Todos have been bulk added from CSV.")
+            self.preview_window.destroy()
+        
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
+            print(f"An error occurred while processing the CSV file: {e}")
+
 
     def on_search(self, event):
         if self.search_timer:
@@ -179,7 +258,7 @@ class TodoView:
             self.prev_button.config(state=tk.DISABLED)
             self.next_button.config(state=tk.DISABLED)
         else:
-            for todo in filtered_todos[start:start + self.page_size]:
+            for todo in filtered_todos:
                 self.tree.insert("", tk.END, iid=str(todo['_id']),
                              values=(todo['title'], todo['description'], todo.get('status', 'NA'), 'Edit/Delete'))
 
