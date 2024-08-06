@@ -39,7 +39,6 @@ class App:
 
 def main():
     logger = setup_logging()
-      # Your main application code here
     logger.info("Application started")
     
     root = tk.Tk()
