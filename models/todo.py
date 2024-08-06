@@ -33,11 +33,11 @@ class TodoModel:
     def get_total_todos(self, user_id):
         return self.collection.count_documents({"user_id": user_id})
     
-    def get_completed_todos(self):
-        return self.collection.count_documents({"status": 'completed'})
+    def get_completed_todos(self, user_id):
+        return self.collection.count_documents({"status": 'completed', "user_id": user_id})
     
-    def count_todos_by_status(self, status):
-        return self.collection.count_documents({"status": status})
+    def count_todos_by_status(self, user_id, status):
+        return self.collection.count_documents({"status": status, "user_id": user_id })
 
-    def get_latest_todos(self, limit=10):
-        return list(self.collection.find().sort('created_at', -1).limit(limit))
+    def get_latest_todos(self, user_id,limit=10):
+        return list(self.collection.find({"user_id": user_id}).sort('created_at', -1).limit(limit))
