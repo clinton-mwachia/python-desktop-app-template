@@ -22,6 +22,8 @@ class DashboardView:
 
         self.user_role = self.user_model.find_user(self.username)
 
+        self.user = self.user_model.find_user(self.username)
+
         self.setup_sidebar()
 
         # Initially show the dashboard view
@@ -86,7 +88,7 @@ class DashboardView:
         # Summary Box for Total Users
         total_users = self.user_model.get_total_users()
         # Summary Box for Total Completed Todos
-        completed_todos = self.todo_model.get_completed_todos()
+        completed_todos = self.todo_model.get_completed_todos(user_id=self.user['_id'])
 
         # Create beautiful boxes for summary stats
         self.create_summary_box(top_frame, "Total Users", total_users, 0, 0)
@@ -113,9 +115,9 @@ class DashboardView:
         title_label.pack(pady=10)
 
         statuses = [
-            ("Completed", self.todo_model.count_todos_by_status("completed")),
-            ("Active", self.todo_model.count_todos_by_status("active")),
-            ("Domant", self.todo_model.count_todos_by_status("domant"))
+            ("Completed", self.todo_model.count_todos_by_status(status="completed", user_id=self.user['_id'])),
+            ("Active", self.todo_model.count_todos_by_status(status="active", user_id=self.user['_id'])),
+            ("Domant", self.todo_model.count_todos_by_status(status="domant", user_id=self.user['_id']))
         ]
 
         # Determine the number of rows
@@ -137,7 +139,7 @@ class DashboardView:
         tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=(0, 5)) 
 
     def create_latest_todos_table(self):
-        latest_todos = self.todo_model.get_latest_todos()
+        latest_todos = self.todo_model.get_latest_todos(user_id=self.user['_id'])
         rows_to_display = len(latest_todos)
 
         latest_table_frame = tk.Frame(self.content_frame, padx=5, pady=5)
@@ -160,7 +162,7 @@ class DashboardView:
         self.load_latest_todos()
 
     def load_latest_todos(self):
-        latest_todos = self.todo_model.get_latest_todos()
+        latest_todos = self.todo_model.get_latest_todos(user_id=self.user['_id'])
         for todo in latest_todos:
             self.latest_todos_table.insert('', 'end', values=(todo['title'], todo['description'],todo.get('status',''),todo.get('created_at','')))
 
