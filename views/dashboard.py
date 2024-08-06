@@ -3,6 +3,7 @@ from tkinter import ttk
 from views.todo import TodoView
 from views.user import UserView
 from views.profile import ProfileView
+from views.logs import LogsView
 from models.user import UserModel
 from models.todo import TodoModel
 import logging
@@ -31,6 +32,7 @@ class DashboardView:
         tk.Button(self.sidebar_frame, text="Todos", command=self.show_todos).pack(fill=tk.X)
         if self.user_role['role'] == 'admin':
              tk.Button(self.sidebar_frame, text="Users", command=self.show_users).pack(fill=tk.X)
+             tk.Button(self.sidebar_frame, text="Logs", command=self.show_logs).pack(fill=tk.X)
         tk.Button(self.sidebar_frame, text="Profile", command=self.show_profile).pack(fill=tk.X)
         tk.Button(self.sidebar_frame, text="Logout", command=self.logout).pack(fill=tk.X)
 
@@ -42,6 +44,10 @@ class DashboardView:
     def show_todos(self):
         self.clear_content()
         TodoView(self.content_frame, self.username)
+
+    def show_logs(self):
+        self.clear_content()
+        LogsView(self.content_frame)
 
     def show_users(self):
         self.clear_content()
