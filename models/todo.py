@@ -38,3 +38,6 @@ class TodoModel:
     
     def count_todos_by_status(self, status):
         return self.collection.count_documents({"status": status})
+
+    def get_latest_todos(self, limit=10):
+        return list(self.collection.find().sort('created_at', -1).limit(limit))
