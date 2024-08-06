@@ -23,7 +23,7 @@ def setup_logging():
     error_handler.setFormatter(formatter)
 
     # Create and configure the root logger
-    logger = logging.getLogger()
+    logger = logging.getLogger("application_logger")
     logger.setLevel(logging.DEBUG)  # Log all levels
     logger.addHandler(activity_handler)
     logger.addHandler(error_handler)
