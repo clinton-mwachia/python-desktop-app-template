@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
 from auth.auth import AuthController
+import logging
+
+# Initialize the logger
+logger = logging.getLogger("application_logger")
 
 class LoginView:
     def __init__(self, root, on_login_success):
@@ -33,10 +37,13 @@ class LoginView:
         if username and password:
             if self.auth_controller.login(username, password):
                 self.on_login_success(username)
+                logger.info(f'{username} logged in')
             else:
                 messagebox.showerror("Login Failed", "Invalid username or password")
+                logger.error(f'{username}: Invalid username or password')
         else:
             messagebox.showerror("Login Failed", "Please enter username and password")
+            logger.error('Please enter username and password')
 
     def register(self):
         username = self.username_entry.get()
@@ -45,7 +52,10 @@ class LoginView:
         if username and password:
             if self.auth_controller.register(username, password):
                 messagebox.showinfo("Registration Successful", "You can now log in")
+                logger.info(f'{username} registered successfully')
             else:
                 messagebox.showerror("Registration Failed", "Username already exists")
+                logger.error(f'{username}: already exists')
         else:
             messagebox.showerror("Registration Failed", "please provide the Username and password")
+            logger.error('please provide the Username and password')

@@ -5,6 +5,10 @@ from views.user import UserView
 from views.profile import ProfileView
 from models.user import UserModel
 from models.todo import TodoModel
+import logging
+
+# Initialize the logger
+logger = logging.getLogger("application_logger")
 
 class DashboardView:
     def __init__(self, sidebar_frame, content_frame, username, logout_callback):
@@ -49,6 +53,7 @@ class DashboardView:
 
     def logout(self):
         self.clear_content()
+        logger.info(f"{self.username} logged out")
         self.logout_callback()  
 
     def clear_content(self):

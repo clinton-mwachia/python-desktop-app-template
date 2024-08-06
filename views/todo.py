@@ -6,6 +6,10 @@ from auth.auth import AuthController
 from bson.objectid import ObjectId
 from views.notification import NotificationManager
 import csv
+import logging
+
+# Initialize the logger
+logger = logging.getLogger("application_logger")
 
 class TodoView:
     def __init__(self, root, username):
@@ -169,6 +173,7 @@ class TodoView:
 
                     if len(todos_to_add) >= 1000:  # Process in chunks
                         self.todo_model.add_many_todos(todos_to_add)
+                        logger.error(f"{self.username} uploaded {len(todos_to_add)} todos")
                         self.notification_manager.add_notification(f"Bulk Todos: {len(todos_to_add)} todos added")
                         todos_to_add = []
                         self.progress_bar['value'] = index + 1
@@ -176,6 +181,7 @@ class TodoView:
 
             if todos_to_add:
                 self.todo_model.add_many_todos(todos_to_add)
+                logger.error(f"{self.username} uploaded {len(todos_to_add)} todos")
                 self.notification_manager.add_notification(f"Bulk Todos: {len(todos_to_add)} todos added")
 
             self.progress_bar['value'] = total_lines
@@ -295,10 +301,12 @@ class TodoView:
         status = self.status_combobox.get().lower()
         if title and description and status:
             self.todo_model.add_todo(self.user['_id'], title, description, status)
+            logger.info(f'{self.user["username"]} added todo: {title}')
             self.load_todos()
             self.notification_manager.add_notification(f"New todo added: {title}")
         else:
             messagebox.showwarning("Input Error", "Please enter all fields.")
+            logger.error("Input Error: Please enter all fields.")
         self.add_todo_window.destroy()
 
     def update_todo(self, todo_id):
@@ -334,15 +342,18 @@ class TodoView:
         new_status = self.status_combobox.get().lower()
         if new_title and new_description and new_status:
             self.todo_model.update_todo(todo_id, new_title, new_description, new_status)
+            logger.info(f'{self.user["username"]} updated todo: {new_title}')
             self.load_todos()
             self.notification_manager.add_notification(f"todo updated: {new_title}")
         else:
             messagebox.showwarning("Input Error", "Please enter all fields.")
+            logger.error("Input Error: Please enter all fields.")
         self.update_todo_window.destroy()
 
     def delete_todo(self, todo_id):
         if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this todo?"):
             self.todo_model.delete_todo(todo_id)
+            logger.info(f'{self.user["username"]} deleted todo: {todo_id}')
             self.load_todos()
             self.notification_manager.add_notification(f"todo deleted: {todo_id}")
 
