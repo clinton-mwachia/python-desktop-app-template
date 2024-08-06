@@ -5,6 +5,7 @@ from models.todo import TodoModel
 from auth.auth import AuthController
 from bson.objectid import ObjectId
 from views.notification import NotificationManager
+from datetime import datetime
 import csv
 import logging
 
@@ -103,10 +104,12 @@ class TodoView:
         self.tree_frame = tk.Frame(self.todos_frame)
         self.tree_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.tree = ttk.Treeview(self.tree_frame, columns=("title", "description", "status", "actions"), show="headings")
+        self.tree = ttk.Treeview(self.tree_frame, columns=("title", "description", "status", "created at", "updated at", "actions"), show="headings")
         self.tree.heading("title", text="Title")
         self.tree.heading("description", text="Description")
         self.tree.heading("status", text="Status")
+        self.tree.heading('created at', text='Created At')
+        self.tree.heading('updated at', text='Updated At')
         self.tree.heading("actions", text="Actions")
         self.tree.column("actions", width=150, anchor=tk.CENTER)
         self.tree.pack(fill=tk.BOTH, expand=True)
@@ -268,7 +271,9 @@ class TodoView:
         else:
             for todo in filtered_todos:
                 self.tree.insert("", tk.END, iid=str(todo['_id']),
-                             values=(todo['title'], todo['description'], todo.get('status', 'NA'), 'Edit/Delete'))
+                             values=(todo['title'], todo['description'], todo.get('status', 'NA'), 
+                                    todo.get('created_at', ''),
+                                    todo.get('updated_at', ''), 'Edit/Delete'))
 
             self.page_label.config(text=f"Page {self.current_page}")
             self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
