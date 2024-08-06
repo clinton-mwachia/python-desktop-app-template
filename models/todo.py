@@ -15,7 +15,7 @@ class TodoModel:
         self.collection.insert_many(todos)
 
     def get_todos(self, user_id):
-        return self.collection.find({"user_id": user_id})
+        return self.collection.find({"user_id": user_id}).sort('created_at', -1)
 
     def update_todo(self, todo_id, title=None, description=None, status=None):
         update = {'updated_at': datetime.now().strftime("%d-%m-%Y %H:%M:%S")}
