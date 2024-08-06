@@ -8,7 +8,7 @@ class TodoModel:
 
     def add_todo(self, user_id, title, description, status='active'):
         todo = {"user_id": user_id, "title": title, "description": description, 
-                'status':status,'created_at': datetime.now(),'updated_at': datetime.now()}
+                'status':status,'created_at': datetime.now().strftime("%d-%m-%Y %H:%M:%S"),'updated_at': datetime.now().strftime("%d-%m-%Y %H:%M:%S")}
         self.collection.insert_one(todo)
 
     def add_many_todos(self, todos):
@@ -18,7 +18,7 @@ class TodoModel:
         return self.collection.find({"user_id": user_id})
 
     def update_todo(self, todo_id, title=None, description=None, status=None):
-        update = {'updated_at': datetime.now()}
+        update = {'updated_at': datetime.now().strftime("%d-%m-%Y %H:%M:%S")}
         if title:
             update["title"] = title
         if description:
