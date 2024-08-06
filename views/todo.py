@@ -96,7 +96,7 @@ class TodoView:
 
         # sorting frame
         tk.Label(self.filter_frame, text="Sort By:").pack(side=tk.LEFT, padx=5)
-        self.sort_combobox = ttk.Combobox(self.filter_frame, values=["NONE", "title", "status"])
+        self.sort_combobox = ttk.Combobox(self.filter_frame, values=["NONE", "title", "status", 'created_at'])
         self.sort_combobox.set("NONE")
         self.sort_combobox.pack(side=tk.LEFT)
         self.sort_combobox.bind("<<ComboboxSelected>>", self.on_sort_change)
@@ -261,6 +261,8 @@ class TodoView:
             filtered_todos
         elif self.sort_by == "title":
                     filtered_todos.sort(key=lambda x: x['title'])
+        elif self.sort_by == "created_at":
+                    filtered_todos.sort(key=lambda x: x.get('created_at',''))
         elif self.sort_by == "status":
                     filtered_todos.sort(key=lambda x: x.get('status', ''))
 
