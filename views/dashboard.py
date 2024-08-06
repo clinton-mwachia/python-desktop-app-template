@@ -40,6 +40,7 @@ class DashboardView:
         self.clear_content()
         self.create_summary_boxes()
         self.todos_by_status_table()
+        self.create_latest_todos_table()
 
     def show_todos(self):
         self.clear_content()
@@ -107,6 +108,10 @@ class DashboardView:
         table_frame = tk.Frame(self.content_frame, padx=5, pady=5)
         table_frame.pack(fill=tk.BOTH, padx=5, pady=5)
 
+         # Title label
+        title_label = tk.Label(table_frame, text="Todos by Status", font=("Helvetica", 16))
+        title_label.pack(pady=10)
+
         statuses = [
             ("Completed", self.todo_model.count_todos_by_status("completed")),
             ("Active", self.todo_model.count_todos_by_status("active")),
@@ -130,5 +135,33 @@ class DashboardView:
 
         # Pack the Treeview widget with adjusted padding
         tree.pack(fill=tk.BOTH, expand=True, padx=5, pady=(0, 5)) 
+
+    def create_latest_todos_table(self):
+        latest_todos = self.todo_model.get_latest_todos()
+        rows_to_display = len(latest_todos)
+
+        latest_table_frame = tk.Frame(self.content_frame, padx=5, pady=5)
+        latest_table_frame.pack(fill=tk.BOTH, padx=5, pady=5)
+
+        # Title label
+        title_label = tk.Label(latest_table_frame, text="Latest Added Todos", font=("Helvetica", 16))
+        title_label.pack(pady=10)
+        
+        # Set a minimum height to avoid an empty table
+        min_height = 5
+        table_height = max(min_height, rows_to_display)
+        self.latest_todos_table = ttk.Treeview(latest_table_frame, columns=('Title', 'Description', 'Status', 'Created At'), show='headings', height=table_height)
+        self.latest_todos_table.heading('Title', text='Title')
+        self.latest_todos_table.heading('Description', text='Description')
+        self.latest_todos_table.heading('Status', text='Status')
+        self.latest_todos_table.heading('Created At', text='Created At')
+        self.latest_todos_table.pack(expand=True, fill='both')
+
+        self.load_latest_todos()
+
+    def load_latest_todos(self):
+        latest_todos = self.todo_model.get_latest_todos()
+        for todo in latest_todos:
+            self.latest_todos_table.insert('', 'end', values=(todo['title'], todo['description'],todo.get('status',''),todo.get('created_at','')))
 
 
