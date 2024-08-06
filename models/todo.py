@@ -1,12 +1,14 @@
 from utils.database import Database
 from bson.objectid import ObjectId
+from datetime import datetime
 
 class TodoModel:
     def __init__(self):
         self.collection = Database('todo_app').get_collection('todos')
 
     def add_todo(self, user_id, title, description, status='active'):
-        todo = {"user_id": user_id, "title": title, "description": description, 'status':status}
+        todo = {"user_id": user_id, "title": title, "description": description, 
+                'status':status,'created_at': datetime.now(),'updated_at': datetime.now()}
         self.collection.insert_one(todo)
 
     def add_many_todos(self, todos):
@@ -16,7 +18,7 @@ class TodoModel:
         return self.collection.find({"user_id": user_id})
 
     def update_todo(self, todo_id, title=None, description=None, status=None):
-        update = {}
+        update = {'updated_at': datetime.now()}
         if title:
             update["title"] = title
         if description:
