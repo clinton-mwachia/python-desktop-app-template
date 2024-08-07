@@ -38,7 +38,6 @@ class LoginView:
         password = self.password_entry.get()
         if username and password:
             if self.auth_controller.login(username, password):
-                messagebox.showinfo("Login Success", "User logged in successfull")
                 logger.info(f'{username} logged in')
                 self.show_dashboard_callback(username)
             else:
