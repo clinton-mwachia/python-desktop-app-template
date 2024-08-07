@@ -176,7 +176,7 @@ class TodoView:
 
                     if len(todos_to_add) >= 1000:  # Process in chunks
                         self.todo_model.add_many_todos(todos_to_add)
-                        logger.error(f"{self.username} uploaded {len(todos_to_add)} todos")
+                        logger.info(f"{self.username} uploaded {len(todos_to_add)} todos")
                         self.notification_manager.add_notification(f"Bulk Todos: {len(todos_to_add)} todos added")
                         todos_to_add = []
                         self.progress_bar['value'] = index + 1
@@ -184,7 +184,7 @@ class TodoView:
 
             if todos_to_add:
                 self.todo_model.add_many_todos(todos_to_add)
-                logger.error(f"{self.username} uploaded {len(todos_to_add)} todos")
+                logger.info(f"{self.username} uploaded {len(todos_to_add)} todos")
                 self.notification_manager.add_notification(f"Bulk Todos: {len(todos_to_add)} todos added")
 
             self.progress_bar['value'] = total_lines
