@@ -15,9 +15,6 @@ class ProfileView:
         self.user_model = UserModel()
         self.user = self.user_model.find_user(username)
 
-        self.profile_frame = tk.Frame(root, bg='white', borderwidth=2, relief='groove', padx=20, pady=20)
-        self.profile_frame.pack(fill=tk.BOTH)
-
         # notification manager
         # Create a frame for the toolbar
         self.toolbar_frame = tk.Frame(root)
@@ -25,20 +22,19 @@ class ProfileView:
 
         self.notification_manager = NotificationManager(self.toolbar_frame)
 
+        self.profile_frame = tk.Frame(root, borderwidth=2, relief='groove', padx=20, pady=20)
+        self.profile_frame.place(relx=0.5, rely=0.2, anchor='center')
+
         self.setup_profile_frame()
 
     def setup_profile_frame(self):
-        # Create the profile frame
-        profile_frame = tk.Frame(self.root, pady=20)
-        profile_frame.pack(expand=True, fill='both')
-
         # User details
         self.name_var = tk.StringVar()
         self.email_var = tk.StringVar()
         self.active_var = tk.StringVar()
         self.role_var = tk.StringVar()
 
-        details_frame = tk.Frame(profile_frame)
+        details_frame = tk.Frame(self.profile_frame)
         details_frame.grid(row=0, column=1, sticky='w')
 
         tk.Label(details_frame, text="Username:", font=("Helvetica", 14)).grid(row=0, column=0, sticky='w')
@@ -54,7 +50,7 @@ class ProfileView:
         tk.Label(details_frame, textvariable=self.role_var, font=("Helvetica", 14)).grid(row=3, column=1, sticky='w')
 
         # Buttons for updating details and password
-        button_frame = tk.Frame(profile_frame)
+        button_frame = tk.Frame(self.profile_frame)
         button_frame.grid(row=3, column=0, columnspan=2, pady=20)
 
         self.update_button = tk.Button(button_frame, text="Update Details", command=self.update_details)
