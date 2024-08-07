@@ -23,7 +23,7 @@ class ProfileView:
         self.notification_manager = NotificationManager(self.toolbar_frame)
 
         self.profile_frame = tk.Frame(root, borderwidth=2, relief='groove', padx=20, pady=20)
-        self.profile_frame.place(relx=0.5, rely=0.2, anchor='center')
+        self.profile_frame.place(relx=0.5, rely=0.4, anchor='center')
 
         self.setup_profile_frame()
 
@@ -35,19 +35,19 @@ class ProfileView:
         self.role_var = tk.StringVar()
 
         details_frame = tk.Frame(self.profile_frame)
-        details_frame.grid(row=0, column=1, sticky='w')
+        details_frame.grid(row=0, column=0, sticky='w')
 
         tk.Label(details_frame, text="Username:", font=("Helvetica", 14)).grid(row=0, column=0, sticky='w')
-        tk.Label(details_frame, textvariable=self.name_var, font=("Helvetica", 14)).grid(row=0, column=1, sticky='w')
+        tk.Label(details_frame, textvariable=self.name_var, font=("Helvetica", 14)).grid(row=1, column=1, sticky='w')
 
-        tk.Label(details_frame, text="Email:", font=("Helvetica", 14)).grid(row=1, column=0, sticky='w')
-        tk.Label(details_frame, textvariable=self.email_var, font=("Helvetica", 14)).grid(row=1, column=1, sticky='w')
+        tk.Label(details_frame, text="Email:", font=("Helvetica", 14)).grid(row=2, column=0, sticky='w')
+        tk.Label(details_frame, textvariable=self.email_var, font=("Helvetica", 14)).grid(row=3, column=1, sticky='w')
 
-        tk.Label(details_frame, text="Active:", font=("Helvetica", 14)).grid(row=2, column=0, sticky='w')
-        tk.Label(details_frame, textvariable=self.active_var, font=("Helvetica", 14)).grid(row=2, column=1, sticky='w')
+        tk.Label(details_frame, text="Active:", font=("Helvetica", 14)).grid(row=4, column=0, sticky='w')
+        tk.Label(details_frame, textvariable=self.active_var, font=("Helvetica", 14)).grid(row=5, column=1, sticky='w')
 
-        tk.Label(details_frame, text="Role:", font=("Helvetica", 14)).grid(row=3, column=0, sticky='w')
-        tk.Label(details_frame, textvariable=self.role_var, font=("Helvetica", 14)).grid(row=3, column=1, sticky='w')
+        tk.Label(details_frame, text="Role:", font=("Helvetica", 14)).grid(row=6, column=0, sticky='w')
+        tk.Label(details_frame, textvariable=self.role_var, font=("Helvetica", 14)).grid(row=7, column=1, sticky='w')
 
         # Buttons for updating details and password
         button_frame = tk.Frame(self.profile_frame)
