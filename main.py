@@ -1,5 +1,6 @@
 import tkinter as tk
 from views.login import LoginView
+from views.register import RegisterView
 from views.dashboard import DashboardView
 from utils.logger import setup_logging
 
@@ -9,12 +10,17 @@ class App:
         self.sidebar_frame = None
         self.content_frame = None
         self.login_view = None
+        self.register_view = None
 
         self.show_login()
 
     def show_login(self):
         self.clear_frames()
-        self.login_view = LoginView(self.root, self.show_dashboard)
+        self.login_view = LoginView(self.root, self.show_dashboard, self.show_register)
+
+    def show_register(self):
+        self.clear_frames()
+        self.register_view = RegisterView(self.root, self.show_login)
 
     def show_dashboard(self, username):
         self.clear_frames()
@@ -36,6 +42,10 @@ class App:
             self.content_frame = None
         if self.login_view:
             self.login_view.frame.destroy() 
+            self.login_view = None
+        if self.register_view:
+            self.register_view.frame.destroy() 
+            self.register_view = None
 
 def main():
     logger = setup_logging()
