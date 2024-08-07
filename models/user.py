@@ -6,13 +6,16 @@ class UserModel:
     def __init__(self):
         self.collection = Database('todo_app').get_collection('users')
 
-    def create_user(self, username, password, email=None, role=None):
+    def create_user(self, username, password, email, role='admin'):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         user = {"username": username, "password": hashed_password, "email": email, "active": True, "role": role}
         self.collection.insert_one(user)
 
     def find_user(self, username):
         return self.collection.find_one({"username": username})
+    
+    def find_user_by_id(self, userid):
+        return self.collection.find_one({"_id": userid})
 
     def validate_user(self, username, password):
         user = self.find_user(username)
