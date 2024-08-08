@@ -30,7 +30,7 @@ class DashboardView:
         self.show_dashboard()
 
     def setup_sidebar(self):
-        tk.Button(self.sidebar_frame, text="Dashboard", command=self.show_dashboard, width=15).pack(fill=tk.X)
+        tk.Button(self.sidebar_frame, text="Dashboard", command=self.show_dashboard,width=15).pack(fill=tk.X)
         tk.Button(self.sidebar_frame, text="Todos", command=self.show_todos).pack(fill=tk.X)
         if self.user_role['role'] == 'admin':
              tk.Button(self.sidebar_frame, text="Users", command=self.show_users).pack(fill=tk.X)
