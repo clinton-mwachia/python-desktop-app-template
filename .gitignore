@@ -159,3 +159,7 @@ checklist.txt
 notifications.json
 
 settings.json
+
+Output/
+
+logs/
