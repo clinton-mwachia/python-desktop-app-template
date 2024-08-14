@@ -413,7 +413,7 @@ class TodoView:
 
     def generate_receipt(self, todo):
         # Customize the receipt content as needed
-        receipt = f"Receipt for Todo\n"
+        receipt = f"     Receipt for Todo\n"
         receipt += f"Title: {todo['title']}\n"
         receipt += f"Description: {todo.get('description', '')}\n"
         receipt += f"Status: {todo.get('status', 'NA')}\n"
@@ -490,15 +490,15 @@ class TodoView:
         # Add border to the whole page
         pdf.set_draw_color(0, 0, 0)
         pdf.set_line_width(0.3)
-        pdf.rect(10, 10, 190, 277)
+        pdf.rect(10, 10, 150, 70)
 
         # Write receipt content to PDF with a border and line separator
         lines = receipt.splitlines()
         for line in lines:
             if ": " in line:
                 title, content = line.split(": ", 1)
-                pdf.cell(60, 10, title, border=0)
-                pdf.cell(0, 10, content, ln=True, border=0)
+                pdf.cell(60, 10, title, border=0,align='l')
+                pdf.cell(0, 10, content, ln=True, border=0,align='l')
             else:
                 pdf.cell(0, 10, line, ln=True, border=0)
 
