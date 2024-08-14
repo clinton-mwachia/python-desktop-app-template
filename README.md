@@ -12,7 +12,7 @@ This is a Python-based desktop application template using Tkinter for the GUI an
 - Settings: The GUI is provides a sections for updating settings.
 
 ## Project Structure
-.
+```
 ├── auth/
 │   ├── auth.py       # Handles user authentication (login, registration, etc.)
 ├── utils/
@@ -32,6 +32,8 @@ This is a Python-based desktop application template using Tkinter for the GUI an
 │   └── profile.py    # User profile view
 ├── main.py           # Entry point for the application
 └── README.md         # This file
+
+```
 
 ## Installation
 
