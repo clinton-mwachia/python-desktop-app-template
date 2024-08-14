@@ -1,14 +1,22 @@
 import logging
 from datetime import datetime
+import os
 
 class LocalTimeFormatter(logging.Formatter):
     def formatTime(self, record, datefmt=None):
         return datetime.fromtimestamp(record.created).strftime('%Y-%m-%d %H:%M:%S')
 
 def setup_logging():
+    # define the directory
+    dir = os.path.join(os.getcwd(), 'logs')
+    
+    # Create the logs directory if it doesn't exist
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
     # Define log file paths
-    activity_log_file = 'logs/activity.log'
-    error_log_file = 'logs/error.log'
+    activity_log_file= os.path.join(dir, 'activity.log')
+    error_log_file = os.path.join(dir, 'error.log')
 
     # Create a custom formatter for local time
     formatter = LocalTimeFormatter('%(asctime)s - %(levelname)s - %(message)s')
