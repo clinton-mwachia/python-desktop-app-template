@@ -266,16 +266,33 @@ class TodoView:
         elif self.sort_by == "status":
                     filtered_todos.sort(key=lambda x: x.get('status', ''))
 
+        # Define colors for each status
+        status_colors = {
+            "active": "lightgreen",
+            "completed": "yellow",
+            "dormant": "red",
+            "NA": "white"  # Default color
+        }
+
         if not filtered_todos:
             self.tree.insert("", tk.END, iid="no_todo", values=("No todos found", "", "", ""))
             self.prev_button.config(state=tk.DISABLED)
             self.next_button.config(state=tk.DISABLED)
         else:
             for todo in filtered_todos:
+                status = todo.get('status', 'NA')
+                color = status_colors.get(status, "black")
                 self.tree.insert("", tk.END, iid=str(todo['_id']),
                              values=(todo['title'], todo['description'], todo.get('status', 'NA'), 
                                     todo.get('created_at', ''),
-                                    todo.get('updated_at', ''), 'Edit/Delete'))
+                                    todo.get('updated_at', ''), 'Edit/Delete'),
+                                    tags=(color,))
+                
+             # Apply color styles
+            self.tree.tag_configure("lightgreen", background="lightgreen")
+            self.tree.tag_configure("yellow", background="yellow")
+            self.tree.tag_configure("red", background="red")
+            self.tree.tag_configure("white", background="white")
 
             self.page_label.config(text=f"Page {self.current_page}")
             self.prev_button.config(state=tk.NORMAL if self.current_page > 1 else tk.DISABLED)
