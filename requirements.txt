@@ -1,0 +1,4 @@
+         
+pymongo==4.8.0             # MongoDB driver for Python
+bcrypt==3.2.2                # Library for hashing passwords
+pyinstaller==6.9.0          # Packaging Python applications into standalone executables
