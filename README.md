@@ -9,29 +9,29 @@ This is a Python-based desktop application template using Tkinter for the GUI an
 - Task Management: Create, view, edit, and delete tasks. Tasks are associated with users, ensuring each user sees only their own tasks.
 - User Profile: View and update user profiles, including the ability to change the password with confirmation of the old password.
 - Notifications: The GUI is designed to be display notifications to the user when CRUD operations are done to the tasks.
-- Settings: The GUI is provides a sections for updating settings.
+- Settings: The GUI provides a section for updating settings of the app.
 
 ## Project Structure
 ```
 ├── auth/
-│   ├── auth.py       # Handles user authentication (login, registration, etc.)
+│   ├── auth.py          # Handles user authentication (login, registration, etc.)
 ├── utils/
-│   ├── database.py   # MongoDB connection and operations
-│   └── logger.py     # Logger setup for the 
+│   ├── database.py      # MongoDB connection and operations
+│   └── logger.py        # Logger setup for the 
 ├── models/
-|   |── todo.py     # Todo models 
-|   └── user.py     # User models 
+|   |── todo.py          # Todo models 
+|   └── user.py          # User models 
 ├── views/
-│   ├── login.py      # Login view
-│   ├── register.py   # Register view
-│   ├── dashboard.py  # Dashboard view
-│   ├── todo.py       # Todo view
-│   ├── user.py       # User view
+│   ├── login.py         # Login view
+│   ├── register.py      # Register view
+│   ├── dashboard.py     # Dashboard view
+│   ├── todo.py          # Todo view
+│   ├── user.py          # User view
 │   ├── notification.py  # Notification view
-│   ├── logs.py       # logs view
-│   └── profile.py    # User profile view
-├── main.py           # Entry point for the application
-└── README.md         # This file
+│   ├── logs.py          # logs view
+│   └── profile.py       # User profile view
+├── main.py              # Entry point for the application
+└── README.md            # This file
 
 ```
 
