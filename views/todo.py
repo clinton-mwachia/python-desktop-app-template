@@ -1,13 +1,15 @@
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import messagebox, filedialog, Toplevel, Scrollbar, Text, scrolledtext
 from tkinter import ttk
 from models.todo import TodoModel
 from auth.auth import AuthController
 from bson.objectid import ObjectId
 from views.notification import NotificationManager
-from datetime import datetime
 import csv
 import logging
+from fpdf import FPDF
+import os
+import tempfile
 
 # Initialize the logger
 logger = logging.getLogger("application_logger")
@@ -19,6 +21,7 @@ class TodoView:
         self.todo_model = TodoModel()
         self.page_size = 30
         self.current_page = 1
+        self.selected_todo_id = None
 
         # Get user information from AuthController
         self.auth_controller = AuthController()
@@ -386,6 +389,7 @@ class TodoView:
         if not selected_item:
             return
         todo_id = selected_item[0]
+        self.selected_todo_id = todo_id
 
         self.action_window = tk.Toplevel(self.root)
         self.action_window.title("Todo Actions")
@@ -396,9 +400,114 @@ class TodoView:
         delete_button = tk.Button(self.action_window, text="Delete", command=lambda: self.confirm_delete(todo_id))
         delete_button.pack(pady=5)
 
+        self.print_receipt_button = tk.Button(self.action_window, text="Print Receipt", command=self.print_receipt)
+        self.print_receipt_button.pack(pady=5)
+
+    def preview_receipt(self, todo_id):    
+        todo = self.todo_model.collection.find_one({"_id": ObjectId(todo_id)})
+        if todo:
+            receipt = self.generate_receipt(todo)
+            self.show_receipt_preview(receipt)
+        else:
+            messagebox.showerror("Error", "Selected todo item not found")
+
+    def generate_receipt(self, todo):
+        # Customize the receipt content as needed
+        receipt = f"Receipt for Todo\n"
+        receipt += f"Title: {todo['title']}\n"
+        receipt += f"Description: {todo.get('description', '')}\n"
+        receipt += f"Status: {todo.get('status', 'NA')}\n"
+        receipt += f"Created At: {todo.get('created_at', '')}\n"
+        receipt += f"Updated At: {todo.get('updated_at', '')}\n"
+        return receipt
+
+    def show_receipt_preview(self, receipt):
+        preview_window = Toplevel(self.root)
+        preview_window.title("Receipt Preview")
+        
+        # Add a scrollable text widget to display the receipt
+        text_widget = Text(preview_window, wrap=tk.WORD, height=15, width=50)
+        text_widget.insert(tk.END, receipt)
+        text_widget.config(state=tk.DISABLED)
+        
+        scroll_bar = Scrollbar(preview_window, command=text_widget.yview)
+        text_widget.config(yscrollcommand=scroll_bar.set)
+        
+        text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Add a Print button to the preview window
+        print_button = tk.Button(preview_window, text="Print", command=lambda: [self.print_receipt(),preview_window.destroy])
+        print_button.pack(pady=10)
+
     def confirm_delete(self, todo_id):
         if messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this todo?"):
             self.delete_todo(todo_id)
+
+    def print_receipt(self):     
+        todo = self.todo_model.collection.find_one({"_id": ObjectId(self.selected_todo_id)})
+        if todo:
+            receipt = self.generate_receipt(todo)
+            # Create a preview window
+            preview_window = tk.Toplevel(self.root)
+            preview_window.title("Receipt Preview")
+            preview_window.geometry("400x400")
+
+            # Create a scrolled text widget to display the receipt
+            text_area = scrolledtext.ScrolledText(preview_window, wrap=tk.WORD, width=50, height=20)
+            text_area.insert(tk.END, receipt)
+            text_area.config(state=tk.DISABLED)
+            text_area.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+            # Add "Print" and "Cancel" buttons
+            button_frame = tk.Frame(preview_window)
+            button_frame.pack(pady=10)
+
+            def confirm_print():
+                preview_window.destroy()
+                self.confirm_print_receipt(receipt)
+
+            print_button = tk.Button(button_frame, text="Print", command=confirm_print)
+            print_button.pack(side=tk.LEFT, padx=10)
+
+            cancel_button = tk.Button(button_frame, text="Cancel", command=preview_window.destroy)
+            cancel_button.pack(side=tk.LEFT)
+
+            messagebox.showinfo("Print", "Receipt sent to printer")
+        else:
+            messagebox.showerror("Error", "Selected todo item not found")
+
+    def confirm_print_receipt(self, receipt):
+        # Create a PDF file in a temporary directory
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+        temp_file_path = temp_file.name
+        temp_file.close()
+
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+
+        # Add border to the whole page
+        pdf.set_draw_color(0, 0, 0)
+        pdf.set_line_width(0.3)
+        pdf.rect(10, 10, 190, 277)
+
+        # Write receipt content to PDF with a border and line separator
+        lines = receipt.splitlines()
+        for line in lines:
+            if ": " in line:
+                title, content = line.split(": ", 1)
+                pdf.cell(60, 10, title, border=0)
+                pdf.cell(0, 10, content, ln=True, border=0)
+            else:
+                pdf.cell(0, 10, line, ln=True, border=0)
+
+        pdf.output(temp_file_path)
+
+        # Open the PDF file (Windows-specific)
+        os.startfile(temp_file_path, "print")
+
+        messagebox.showinfo("Print", "Receipt sent to printer") 
 
     def prev_page(self):
         if self.current_page > 1:
