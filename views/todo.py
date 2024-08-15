@@ -15,6 +15,12 @@ import tempfile
 # Initialize the logger
 logger = logging.getLogger("application_logger")
 
+class PDF(FPDF):
+    def header(self):
+        self.set_font("Arial", 'B', 12)  # Bold font for the title
+        self.cell(0, 10, "Receipt", ln=True, align="C")
+        self.ln(2)
+
 class TodoView:
     def __init__(self, root, username):
         self.root = root
@@ -446,7 +452,7 @@ class TodoView:
             self.delete_todo(todo_id)
 
     def print_receipt(self, receipt):
-        pdf = FPDF(orientation="P", unit="mm", format=(100,100))
+        pdf = PDF(orientation="P", unit="mm", format=(100,100))
         pdf.add_page()
         pdf.set_font("Arial", size=8)
         pdf.set_left_margin(5)
