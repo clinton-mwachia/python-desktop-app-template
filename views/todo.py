@@ -15,12 +15,6 @@ import tempfile
 # Initialize the logger
 logger = logging.getLogger("application_logger")
 
-class PDF(FPDF):
-    def header(self):
-        self.set_font("Arial", 'B', 12)  # Bold font for the title
-        self.cell(0, 10, "Receipt", ln=True, align="C")
-        self.ln(2)
-
 class TodoView:
     def __init__(self, root, username):
         self.root = root
@@ -419,7 +413,7 @@ class TodoView:
 
     def generate_receipt(self, todo):
         # Customize the receipt content as needed
-        receipt =  f"Receipt for Todo\n"
+        receipt =  f""
         receipt += f"Title: {todo['title']}\n"
         receipt += f"Description: {todo.get('description', '')}\n"
         receipt += f"Status: {todo.get('status', 'NA')}\n"
@@ -452,14 +446,26 @@ class TodoView:
             self.delete_todo(todo_id)
 
     def print_receipt(self, receipt):
-        pdf = PDF(orientation="P", unit="mm", format=(100,100))
+        pdf = FPDF(orientation="P", unit="mm", format=(100,100))
         pdf.add_page()
         pdf.set_font("Arial", size=8)
         pdf.set_left_margin(5)
         pdf.set_right_margin(5)
+        pdf.set_top_margin(5) 
+        pdf.set_auto_page_break(auto=True, margin=5)
+
+        # Set the starting y-position 
+        pdf.set_y(pdf.get_y()) 
 
         # Add the main content
-        pdf.multi_cell(0, 5, receipt,border=1, align="C")
+        pdf.set_font("Arial", 'B', 10)
+        pdf.multi_cell(0, 5, "Receipt Title", border="LTR", align="C")  # Title with top border
+        pdf.set_font("Arial", size=8)
+        pdf.multi_cell(0, 5, receipt, border="LTRB", align="C") # add left, top, right and bottom borders
+
+        # Footer Section
+        pdf.set_font("Arial", 'I', 8)  # Italicize font for the footer
+        pdf.multi_cell(0, 5, "Thank you for your purchase!\nVisit us at www.retailflow.com\nReturn policy: 10 days with receipt", border=1,align="C")
         pdf.ln()
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf:
