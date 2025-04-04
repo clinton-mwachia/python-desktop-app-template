@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DesktopTemplate"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "Clinton Moshe"
 #define MyAppURL "NA"
 #define MyAppExeName "main.exe"
@@ -11,7 +11,7 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{8B5D708F-9E7B-4C53-AC1A-9C83AFAF7B5D}
+AppId={{8B5D708F-9E7B-4C53-AC1A-9C83AFAF7B5D}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
