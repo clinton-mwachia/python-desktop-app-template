@@ -1,4 +1,5 @@
          
 pymongo==4.8.0             # MongoDB driver for Python
 bcrypt==3.2.2                # Library for hashing passwords
-pyinstaller==6.9.0          # Packaging Python applications into standalone executables
+pyinstaller==6.10.0          # Packaging Python applications into standalone executables
+fpdf==1.7.2

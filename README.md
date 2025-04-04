@@ -12,15 +12,16 @@ This is a Python-based desktop application template using Tkinter for the GUI an
 - Settings: The GUI provides a section for updating settings of the app.
 
 ## Project Structure
+
 ```
 ├── auth/
 │   ├── auth.py          # Handles user authentication (login, registration, etc.)
 ├── utils/
 │   ├── database.py      # MongoDB connection and operations
-│   └── logger.py        # Logger setup for the 
+│   └── logger.py        # Logger setup for the
 ├── models/
-|   |── todo.py          # Todo models 
-|   └── user.py          # User models 
+|   |── todo.py          # Todo models
+|   └── user.py          # User models
 ├── views/
 │   ├── login.py         # Login view
 │   ├── register.py      # Register view
@@ -50,10 +51,16 @@ This is a Python-based desktop application template using Tkinter for the GUI an
 git clone https://github.com/clinton-mwachia/desktop-app-template.git
 cd desktop-app-template
 ```
+
+## NOTE
+
+- If you are running the code using cmd on vscode, use _py_ followed by other commands.
+- Use _python_ follwed by other commands on CMD.
+
 2. Install the required packages:
 
 ```bash
-pip install -r requirements.txt
+py pip install -r requirements.txt
 ```
 
 3. Start the MongoDB server (if not already running).
@@ -61,7 +68,7 @@ pip install -r requirements.txt
 4. Run the application:
 
 ```bash
-python main.py
+py main.py
 ```
 
 ## Compiling to an Executable
@@ -70,16 +77,10 @@ You can compile the Python application into a standalone executable using `PyIns
 
 ### Steps to Compile
 
-1. Install PyInstaller:
+1. Navigate to the project directory and run the following command to create a standalone executable:
 
 ```bash
-pip install pyinstaller
-```
-
-2. Navigate to the project directory and run the following command to create a standalone executable:
-
-```bash
-pyinstaller --onefile --windowed main.py
+py -m pyInstaller --onefile --windowed main.py
 ```
 
 - `--onefile`: Packages the application into a single executable file.
@@ -92,7 +93,7 @@ pyinstaller --onefile --windowed main.py
 - You can customize the executable by adding an icon with the `--icon` option:
 
 ```bash
-pyinstaller --onefile --windowed --icon=path_to_icon.ico main.py
+py -m pyInstaller --onefile --windowed --icon=path_to_icon.ico main.py
 ```
 
 - If your application requires external files (e.g., images, configuration files), you may need to adjust the `PyInstaller` spec file or manually copy these files to the appropriate directory after building the executable.
@@ -110,7 +111,7 @@ Make sure your application is working correctly and all dependencies are working
 First, you need to install PyInstaller if you haven't already:
 
 ```bash
-pip install pyinstaller
+py -m pip install pyinstaller
 ```
 
 ### 2. Create a PyInstaller Spec File
@@ -120,7 +121,7 @@ PyInstaller uses a spec file to know how to build your executable. You can custo
 Run PyInstaller to generate an initial spec file and executable:
 
 ```bash
-pyinstaller --onefile --noconsole main.py
+py -m pyinstaller --onefile --noconsole main.py
 ```
 
 This will generate the following files and folders:
@@ -190,12 +191,12 @@ datas=[
 After customizing your `.spec` file, run PyInstaller again:
 
 ```bash
-pyinstaller main.spec
+py -m pyinstaller main.spec
 ```
 
 This will create the executable in the `dist/main.exe` folder.
 
-##  Create a Windows Installer with Inno Setup
+## Create a Windows Installer with Inno Setup
 
 Inno Setup is a free installer for Windows programs. It’s easy to use and widely supported.
 
@@ -326,6 +327,4 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 This project is licensed under the Appache License. See the `LICENSE` file for more details.
 
-
-*Happy coding!*
-
+_Happy coding!_
