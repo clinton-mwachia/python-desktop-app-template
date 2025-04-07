@@ -40,7 +40,7 @@ This is a Python-based desktop application template using Tkinter for the GUI an
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.13.2
 - MongoDB
 
 ### Setup
